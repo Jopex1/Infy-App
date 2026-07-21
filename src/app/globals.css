@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #027027;
+  --color-primary-light: #028e32;
+  --color-primary-dark: #015e1f;
+  --color-accent: #f7e03c;
+  --color-background: #ffffff;
+}
+
+body {
+  background-color: #f7f7f7;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Comprehensive Dark Mode ── */
+.dark body,
+.dark main {
+  background-color: #121212 !important;
+  color: #f1f1f1 !important;
+}
+
+.dark .bg-white { background-color: #1a1a1a !important; }
+.dark .bg-gray-50 { background-color: #111111 !important; }
+.dark .bg-gray-100 { background-color: #222222 !important; }
+
+.dark .bg-green-50 { background-color: #051a0d !important; border-color: #0b3d1f !important; }
+.dark .bg-orange-50 { background-color: #1f1005 !important; border-color: #3b200b !important; }
+.dark .bg-blue-50 { background-color: #0a1429 !important; border-color: #172a53 !important; }
+.dark .bg-pink-50 { background-color: #2a0a16 !important; border-color: #55142d !important; }
+.dark .bg-yellow-50 { background-color: #292305 !important; border-color: #53480b !important; }
+.dark .bg-teal-50 { background-color: #051f1c !important; border-color: #0b4039 !important; }
+.dark .bg-indigo-50 { background-color: #10102a !important; border-color: #212155 !important; }
+.dark .bg-sky-50 { background-color: #071b26 !important; border-color: #0e374d !important; }
+.dark .bg-lime-50 { background-color: #161e05 !important; border-color: #2c3c0b !important; }
+.dark .bg-rose-50 { background-color: #26070f !important; border-color: #4d0e1e !important; }
+.dark .bg-red-50 { background-color: #290808 !important; border-color: #4a0d0d !important; }
+
+.dark .bg-green-100 { background-color: #0b3d1f !important; color: #86efac !important; }
+.dark .bg-blue-100 { background-color: #172a53 !important; color: #93c5fd !important; }
+.dark .bg-pink-100 { background-color: #55142d !important; color: #f9a8d4 !important; }
+.dark .bg-yellow-100 { background-color: #53480b !important; color: #fde047 !important; }
+.dark .bg-teal-100 { background-color: #0b4039 !important; color: #5eead4 !important; }
+.dark .bg-indigo-100 { background-color: #212155 !important; color: #a5b4fc !important; }
+.dark .bg-sky-100 { background-color: #0e374d !important; color: #7dd3fc !important; }
+.dark .bg-lime-100 { background-color: #2c3c0b !important; color: #bef264 !important; }
+.dark .bg-rose-100 { background-color: #4d0e1e !important; color: #fda4af !important; }
+.dark .bg-red-100 { background-color: #4a0d0d !important; color: #fca5a5 !important; }
+
+.dark .text-gray-900, .dark .text-gray-800, .dark .text-gray-700 { color: #f1f1f1 !important; }
+.dark .text-gray-600, .dark .text-gray-500, .dark .text-gray-400 { color: #9ca3af !important; }
+.dark .text-\[\#027027\] { color: #4ade80 !important; }
+
+.dark .border-gray-100, .dark .border-gray-200 { border-color: #2a2a2a !important; }
+
+/* ── Remove scroll shadows globally ── */
+* {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  box-shadow: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* ── Safe Area Page Bottom Padding ──
+   All pages should use pb-safe or add inline padding-bottom.
+   72px = bottom nav height. env() adds device system nav area. */
+.pb-safe {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+/* Apply safe bottom automatically to common page wrappers */
+main > div,
+main > section {
+  /* Individual pages manage their own pb via pb-32 or pb-safe */
+}
+
+/* react-phone-number-input custom styles */
+.phone-input-wrapper .PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding: 6px 0;
+}
+
+.phone-input-wrapper .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 10px;
+  border-right: 1px solid #e5e7eb;
+  margin-right: 4px;
+  cursor: pointer;
+}
+
+.phone-input-wrapper .PhoneInputCountryIcon {
+  width: 28px;
+  height: 20px;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.phone-input-wrapper .PhoneInputCountryIconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-input-wrapper .PhoneInputCountrySelect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.phone-input-wrapper .PhoneInputCountrySelectArrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #6b7280;
+  margin-left: 2px;
+}
+
+.phone-input-wrapper .PhoneInputInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #1f2937;
+  padding: 6px 0;
+}
+
+.phone-input-wrapper .PhoneInputInput::placeholder {
+  color: #9ca3af;
+}
+
+/* no-border version for right-aligned layout */
+.phone-input-wrapper-no-border .PhoneInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-input-wrapper-no-border .PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.phone-input-wrapper-no-border .PhoneInputCountryIcon {
+  width: 24px;
+  height: 17px;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.phone-input-wrapper-no-border .PhoneInputCountryIconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-input-wrapper-no-border .PhoneInputCountrySelect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.phone-input-wrapper-no-border .PhoneInputCountrySelectArrow {
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid #9ca3af;
+  margin-left: 2px;
+}
+
+.phone-input-wrapper-no-border .PhoneInputInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #1f2937;
+  text-align: right;
+  width: 100%;
+}
+
+.phone-input-wrapper-no-border .PhoneInputInput::placeholder {
+  color: #9ca3af;
+}
