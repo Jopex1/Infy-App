@@ -96,54 +96,51 @@ export default function SignUp() {
             </div>
           </div>
 
-          {/* Right-aligned block for Phone, Gmail, Location */}
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl px-4">
-            
-            {/* Phone */}
-            <div className="flex items-center justify-between py-3.5 border-b border-gray-100 relative">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-24">Phone</span>
-              <div className="flex items-center flex-1 justify-start phone-input-wrapper-no-border">
-                <PhoneInput
-                  international
-                  defaultCountry="GH"
-                  value={phone}
-                  onChange={(val) => {
-                    if (!val) { setPhone(""); return; }
-                    // Strip leading 0 after country code
-                    setPhone(val);
-                  }}
-                  onBlur={() => {
-                    // e.g. if user typed 0241234567 with GH, fix to +233241234567
-                    if (phone) {
-                      const fixed = phone.replace(/(\+\d+)0(\d)/, "$1$2");
-                      setPhone(fixed);
-                    }
-                  }}
-                  placeholder="241 234 567"
-                  className="w-full justify-start"
-                />
-              </div>
+          {/* Phone */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Phone</label>
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 phone-input-wrapper-no-border">
+              <PhoneInput
+                international
+                defaultCountry="GH"
+                value={phone}
+                onChange={(val) => {
+                  if (!val) { setPhone(""); return; }
+                  setPhone(val);
+                }}
+                onBlur={() => {
+                  if (phone) {
+                    const fixed = phone.replace(/(\+\d+)0(\d)/, "$1$2");
+                    setPhone(fixed);
+                  }
+                }}
+                placeholder="241 234 567"
+                className="w-full bg-transparent outline-none text-sm text-gray-800"
+              />
             </div>
+          </div>
 
-            {/* Gmail */}
-            <div className="flex items-center justify-between py-3.5 border-b border-gray-200">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-24">Gmail</span>
-              <div className="flex flex-1 items-center justify-end">
-                <input required type="text" placeholder="ama" value={form.email.replace("@gmail.com", "")}
-                  onChange={e => setForm({...form, email: e.target.value + "@gmail.com"})}
-                  className="text-right outline-none text-sm text-gray-800 bg-transparent placeholder-gray-400 w-full" />
-                <span className="text-sm text-gray-800 ml-1">@gmail.com</span>
-              </div>
+          {/* Gmail */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Gmail</label>
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3">
+              <Mail size={16} className="text-[#027027] shrink-0" />
+              <input required type="text" placeholder="ama" value={form.email.replace("@gmail.com", "")}
+                onChange={e => setForm({...form, email: e.target.value + "@gmail.com"})}
+                className="bg-transparent outline-none text-sm w-full text-gray-800 placeholder-gray-400" />
+              <span className="text-sm text-gray-400">@gmail.com</span>
             </div>
+          </div>
 
-            {/* Location */}
-            <div className="flex items-center justify-between py-3.5">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wide w-24">Location</span>
+          {/* Location */}
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Location</label>
+            <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3">
+              <MapPin size={16} className="text-[#027027] shrink-0" />
               <input type="text" placeholder="Kumasi, Ghana" value={form.location}
                 onChange={e => setForm({...form, location: e.target.value})}
-                className="text-right flex-1 outline-none text-sm text-gray-800 bg-transparent placeholder-gray-400" />
+                className="bg-transparent outline-none text-sm w-full text-gray-800 placeholder-gray-400" />
             </div>
-
           </div>
 
           {/* Password (Original style) */}
@@ -179,9 +176,12 @@ export default function SignUp() {
           <button type="submit"
             className="w-full bg-gradient-to-r from-[#027027] to-[#028e32] text-white font-bold py-3.5 rounded-2xl shadow-[0_8px_20px_-6px_rgba(2,112,39,0.5)] active:scale-95 transition-all text-[15px] flex items-center justify-center gap-2 mt-2">
             Create Account
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="opacity-80">
-              <path d="M9 18l6-6-6-6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          </button>
+          
+          <button type="button" onClick={() => router.push("/login")}
+            className="w-full border border-[#027027] text-[#027027] font-bold py-3.5 rounded-2xl active:scale-95 transition-all text-[15px] flex items-center justify-center gap-2 mt-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
           </button>
 
           <p className="text-center text-sm text-gray-400 mt-4 pb-4">

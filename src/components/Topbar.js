@@ -14,11 +14,11 @@ export default function Topbar() {
   const [logoutDialog, setLogoutDialog] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
 
-  if (pathname === "/onboarding" || pathname === "/login" || pathname === "/signup") return null;
-
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  if (pathname === "/onboarding" || pathname === "/login" || pathname === "/signup") return null;
 
   const toggleDark = () => {
     setDarkMode(!darkMode);
@@ -49,7 +49,6 @@ export default function Topbar() {
       items: [
         { label: "Dashboard", action: () => { setMenuOpen(false); router.push("/kids"); } },
         { label: "Child Information", action: () => { setMenuOpen(false); router.push("/profile"); } },
-        { label: "Edit Child Details", action: () => { setMenuOpen(false); router.push("/profile"); } },
         { label: "Growth History", action: () => { setMenuOpen(false); router.push("/kids"); } },
       ]
     },
@@ -92,11 +91,7 @@ export default function Topbar() {
     {
       title: "Notifications",
       icon: <Bell size={20}/>,
-      items: [
-        { label: "All Notifications", action: () => { setMenuOpen(false); router.push("/notifications"); } },
-        { label: "Action Forms", action: () => { setMenuOpen(false); router.push("/notifications"); } },
-        { label: "Reminders", action: () => { setMenuOpen(false); router.push("/notifications"); } },
-      ]
+      action: () => { setMenuOpen(false); router.push("/notifications"); }
     },
     {
       title: "Logout",
@@ -112,7 +107,7 @@ export default function Topbar() {
         style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
       >
         <div className="relative w-28 h-9 flex items-center z-10">
-          <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Logo" fill className="object-contain object-left" priority />
+          <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Logo" fill sizes="112px" className="object-contain object-left" priority />
         </div>
         
         <div className="absolute left-1/2 -translate-x-1/2 font-medium text-lg mt-[calc(env(safe-area-inset-top)/2)]">
@@ -130,7 +125,7 @@ export default function Topbar() {
           <div className="fixed inset-y-0 right-0 z-50 w-4/5 max-w-sm flex pointer-events-auto bg-gray-50 animate-in slide-in-from-right duration-300 flex-col shadow-2xl overflow-hidden">
             {/* Watermark Logo */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-5">
-               <Image src="/icons/infy wordmark .png" alt="Infy Watermark" width={250} height={250} className="object-contain" />
+               <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Watermark" width={250} height={250} style={{width: 'auto', height: 'auto'}} className="object-contain" />
             </div>
 
             <div

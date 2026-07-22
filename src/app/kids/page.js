@@ -217,7 +217,7 @@ export default function KidsDashboard() {
     try {
       let avatarUrl = "";
       if (newKid.avatarFile) {
-        const imageRef = ref(storage, \`avatars/\${user.uid}_\${Date.now()}\`);
+        const imageRef = ref(storage, `avatars/${user.uid}_${Date.now()}`);
         await uploadBytes(imageRef, newKid.avatarFile);
         avatarUrl = await getDownloadURL(imageRef);
       }

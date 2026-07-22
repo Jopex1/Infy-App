@@ -55,15 +55,15 @@ export default function Login() {
                 ? <Mail size={16} className="text-[#027027] shrink-0"/>
                 : <Phone size={16} className="text-[#027027] shrink-0"/>}
               {mode === "email" ? (
-                <div className="flex flex-1 items-center justify-end">
+                <>
                   <input required
                     type="text"
                     placeholder="ama"
                     value={form.identifier.replace("@gmail.com", "")}
                     onChange={e => setForm({...form, identifier: e.target.value + "@gmail.com"})}
-                    className="bg-transparent outline-none text-sm w-full text-right text-gray-800" />
+                    className="bg-transparent outline-none text-sm w-full text-left text-gray-800" />
                   <span className="text-sm text-gray-800 ml-1">@gmail.com</span>
-                </div>
+                </>
               ) : (
                 <input required
                   type="tel"

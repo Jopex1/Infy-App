@@ -67,11 +67,11 @@ export default function Home() {
             <Baby size={120} />
           </div>
 
-          <div className="bg-white border border-green-200 rounded-[20px] p-4 shadow-sm mb-5 relative z-10 text-left">
-            <p className="text-sm text-gray-600">
-              <strong className="text-[#027027]">Keep Track of Every Milestone</strong><br/><br/>
+          <div className="bg-white border border-green-200 rounded-[20px] p-4 shadow-sm mb-5 relative z-10 text-justify">
+            <div className="text-sm text-gray-600">
+              <div className="text-center mb-2"><strong className="text-[#027027] text-[17px]">Keep Track of Every Milestone</strong></div>
               Everything you need to monitor your child's progress, immunizations, weighing schedules, and personalized health details all in one place.
-            </p>
+            </div>
           </div>
 
           <div className="flex justify-center items-center gap-6 mb-6 relative z-10 text-[#027027]">
