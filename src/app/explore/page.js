@@ -30,7 +30,7 @@ const categories = [
     iconBg: "bg-purple-100",
     videos: [
       { title: "Child Development Stages", id: "3F4XH7ACWOY" },
-      { title: "Early Childhood Learning", id: "ApXoWvfEYVU" },
+      { title: "Early Childhood Learning", id: "JvmTlvBUhuQ" },
     ],
   },
   {
@@ -39,7 +39,7 @@ const categories = [
     color: "bg-pink-50 border-pink-200",
     iconBg: "bg-pink-100",
     videos: [
-      { title: "Newborn Baby Essentials", id: "bJ-HypqiRZA" },
+      { title: "Newborn Baby Essentials", id: "JvmTlvBUhuQ" },
       { title: "First Days With Your Baby", id: "9RVvxFNhHdI" },
     ],
   },
@@ -60,7 +60,7 @@ const categories = [
     iconBg: "bg-teal-100",
     videos: [
       { title: "Baby Safety at Home", id: "3F4XH7ACWOY" },
-      { title: "First Aid for Infants", id: "9RVvxFNhHdI" },
+      { title: "First Aid for Infants", id: "JvmTlvBUhuQ" },
     ],
   },
   {
@@ -70,7 +70,7 @@ const categories = [
     iconBg: "bg-yellow-100",
     videos: [
       { title: "Positive Parenting Tips", id: "ApXoWvfEYVU" },
-      { title: "Building Strong Parent-Child Bond", id: "k-8IKJkFvQ8" },
+      { title: "Building Strong Parent-Child Bond", id: "JvmTlvBUhuQ" },
     ],
   },
   {
@@ -79,7 +79,7 @@ const categories = [
     color: "bg-green-50 border-green-200",
     iconBg: "bg-green-100",
     videos: [
-      { title: "Baby Growth Milestones", id: "bJ-HypqiRZA" },
+      { title: "Baby Growth Milestones", id: "3F4XH7ACWOY" },
       { title: "Tracking Your Baby's Progress", id: "Oe0hfVNfLAI" },
     ],
   },
@@ -89,7 +89,7 @@ const categories = [
     color: "bg-indigo-50 border-indigo-200",
     iconBg: "bg-indigo-100",
     videos: [
-      { title: "Healthy Sleep for Babies", id: "9RVvxFNhHdI" },
+      { title: "Healthy Sleep for Babies", id: "JvmTlvBUhuQ" },
       { title: "Baby Sleep Tips", id: "3F4XH7ACWOY" },
     ],
   },
@@ -99,8 +99,8 @@ const categories = [
     color: "bg-sky-50 border-sky-200",
     iconBg: "bg-sky-100",
     videos: [
-      { title: "Baby Bath & Hygiene Guide", id: "k-8IKJkFvQ8" },
-      { title: "Skincare for Babies", id: "ApXoWvfEYVU" },
+      { title: "Baby Bath & Hygiene Guide", id: "JvmTlvBUhuQ" },
+      { title: "Skincare for Babies", id: "Oe0hfVNfLAI" },
     ],
   },
   {
@@ -110,7 +110,7 @@ const categories = [
     iconBg: "bg-lime-100",
     videos: [
       { title: "Play Activities for Babies", id: "Oe0hfVNfLAI" },
-      { title: "Early Learning Through Play", id: "bJ-HypqiRZA" },
+      { title: "Early Learning Through Play", id: "3F4XH7ACWOY" },
     ],
   },
   {
@@ -119,7 +119,7 @@ const categories = [
     color: "bg-rose-50 border-rose-200",
     iconBg: "bg-rose-100",
     videos: [
-      { title: "Supporting Children with Special Needs", id: "9RVvxFNhHdI" },
+      { title: "Supporting Children with Special Needs", id: "3F4XH7ACWOY" },
       { title: "Inclusive Parenting", id: "ApXoWvfEYVU" },
     ],
   },

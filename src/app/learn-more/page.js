@@ -21,7 +21,7 @@ const stageData = {
     badge: "bg-pink-100 text-pink-700",
     description: "Babies spend most of their time sleeping, rely on reflexes such as sucking and rooting, and begin recognising familiar voices and faces.",
     videos: [
-      { title: "Newborn Baby Care Essentials", id: "bJ-HypqiRZA" },
+      { title: "Newborn Baby Care Essentials", id: "JvmTlvBUhuQ" },
       { title: "Understanding Your Newborn", id: "9RVvxFNhHdI" },
     ],
     sections: [
@@ -55,8 +55,8 @@ const stageData = {
     badge: "bg-green-100 text-green-700",
     description: "Children begin walking independently, become highly active, develop speech rapidly and start showing independence.",
     videos: [
-      { title: "Toddler Development Guide", id: "ApXoWvfEYVU" },
-      { title: "Raising Healthy Toddlers", id: "k-8IKJkFvQ8" },
+      { title: "Toddler Development Guide", id: "3F4XH7ACWOY" },
+      { title: "Raising Healthy Toddlers", id: "ApXoWvfEYVU" },
     ],
     sections: [
       { title: "Movement & Activity", content: "Walks independently by 12–15 months. Runs, climbs, and becomes highly active. Hand-eye coordination improves rapidly. Start toddler-proofing your home." },
