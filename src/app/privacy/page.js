@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ArrowLeft, Shield, ChevronDown, ChevronUp } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const sections = [
   {
@@ -79,33 +78,17 @@ function Section({ title, content }) {
 }
 
 export default function PrivacyPage() {
-  const router = useRouter();
-
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-
-      <div className="bg-[#027027] pt-10 pb-7 px-6 rounded-b-[2.5rem]">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => router.back()} className="text-white bg-white/20 p-2 rounded-full transition">
-            <ArrowLeft size={20} />
-          </button>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-            <Shield size={24} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-white text-xl font-bold">Privacy Policy</h1>
-            <p className="text-white/70 text-xs">Last updated: July 2026</p>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 pb-safe pt-4">
       <div className="p-4 space-y-3">
         {sections.map((s, i) => (
           <Section key={i} title={s.title} content={s.content} />
         ))}
       </div>
+
+      <p className="text-center text-xs text-gray-400 py-6">
+        Last updated: July 2026
+      </p>
     </div>
   );
 }

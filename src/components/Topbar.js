@@ -33,7 +33,9 @@ export default function Topbar() {
       case '/notifications': return 'Notifications';
       case '/profile': return 'Profile';
       case '/learn-more': return 'Learn More';
-      case '/explore': return 'Explore';
+      case '/privacy': return 'Privacy & Security';
+      case '/terms': return 'Terms & Conditions';
+      case '/manage-account': return 'Manage Account';
       default: 
         if (pathname?.startsWith('/profile/edit')) return 'Edit Child';
         return '';
