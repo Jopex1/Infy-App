@@ -66,11 +66,12 @@ export default function Carousel({ tips }) {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none", scrollSnapType: "x mandatory" }}
       >
         {loopedTips.map((tip, i) => {
-          const cardColors = ["bg-[#027027]", "bg-blue-600", "bg-amber-600", "bg-purple-600", "bg-rose-600"];
+          const cardColors = ["bg-[#027027]", "bg-blue-700", "bg-amber-700", "bg-purple-800", "bg-rose-800"];
           return (
           <div
             key={i}
-            className={`flex-shrink-0 snap-center rounded-3xl ${cardColors[i % cardColors.length]} h-36 shadow-xl relative flex flex-col justify-center p-5 text-white overflow-hidden`}
+            onClick={() => tip.link && window.open(tip.link, "_blank")}
+            className={`flex-shrink-0 snap-center rounded-3xl ${cardColors[i % cardColors.length]} h-36 shadow-xl relative flex flex-col justify-center p-5 text-white overflow-hidden cursor-pointer`}
             style={{
               width: "82%",
               marginLeft: i === 0 ? "9%" : "0",
@@ -85,8 +86,10 @@ export default function Carousel({ tips }) {
               <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy" fill className="object-contain object-right" />
             </div>
 
-            <h3 className="text-base font-bold mb-1 drop-shadow-sm pr-10 relative z-10">{tip.title}</h3>
-            <p className="text-xs opacity-85 leading-relaxed line-clamp-3 relative z-10">{tip.desc}</p>
+            <div className="mx-3">
+              <h3 className="text-base font-bold mb-1 drop-shadow-sm pr-10 relative z-10">{tip.title}</h3>
+              <p className="text-[15px] opacity-100 leading-tight line-clamp-3 relative z-10">{tip.desc}</p>
+            </div>
           </div>
           );
         })}
@@ -95,7 +98,7 @@ export default function Carousel({ tips }) {
       {/* Pagination Dots — based on original tips only */}
       <div className="flex justify-center mt-3 gap-[6px]">
         {tips.map((_, i) => {
-          const cardColors = ["bg-[#027027]", "bg-blue-600", "bg-amber-600", "bg-purple-600", "bg-rose-600"];
+          const cardColors = ["bg-[#027027]", "bg-blue-700", "bg-amber-700", "bg-purple-800", "bg-rose-800"];
           return (
           <button key={i}
             onClick={() => { setCurrentIndex(i); scrollToIndex(i); }}

@@ -9,7 +9,7 @@ export default function Profile() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
-  const [user, setUser] = useState({ firstName: "Mrs. Ama", lastName: "Sarpong", email: "infytest@example.com", phone: "+233 248 000 1422", location: "Kumasi, Ghana", avatar: null });
+  const [user, setUser] = useState({ firstName: "", lastName: "", email: "", phone: "", location: "", avatar: null });
   const fileRef = useRef();
 
   useEffect(() => {
@@ -18,17 +18,18 @@ export default function Profile() {
     const storedUser = localStorage.getItem("infy_user");
     if (storedUser) {
       const u = JSON.parse(storedUser);
-      setUser(prev => ({
-        ...prev,
-        firstName: u.firstName || prev.firstName,
-        lastName: u.lastName || prev.lastName,
-        email: u.email || prev.email,
-        phone: u.phone || prev.phone,
-        location: u.location || prev.location,
+      setUser({
+        firstName: u.firstName || "",
+        lastName: u.lastName || "",
+        email: u.email || "",
+        phone: u.phone || "",
+        location: u.location || "",
         avatar: u.avatar || null,
-      }));
+      });
+    } else {
+      router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   const saveKids = (updated) => {
     setKids(updated);

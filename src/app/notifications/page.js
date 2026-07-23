@@ -73,23 +73,43 @@ export default function Notifications() {
   }, []);
 
   return (
-    <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 min-h-screen pb-safe mt-2">
+    <div className="flex flex-col h-[calc(100dvh-72px)] overflow-y-auto overscroll-y-contain animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="p-4 space-y-6 pb-safe">
       
       {/* Tab Switcher */}
-      <div className="flex bg-gray-100 p-1 rounded-2xl shadow-inner mb-6">
-        <button 
-          onClick={() => setActiveTab("updates")}
-          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition ${activeTab === 'updates' ? 'bg-white text-[#027027] shadow-sm' : 'text-gray-500'}`}>
-          All
-        </button>
-        <button 
-          onClick={() => setActiveTab("actions")}
-          className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 ${activeTab === 'actions' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-500'}`}>
-          Action Forms {actionItems.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{actionItems.length}</span>}
-        </button>
+      <div className="fixed left-0 right-0 max-w-md mx-auto z-20 bg-white pt-3 pb-1" style={{ top: 'calc(4.5rem + env(safe-area-inset-top, 0px))' }}>
+        <div className="mx-4 bg-white p-2 rounded-full flex items-center justify-between border border-gray-200 shadow-sm">
+          <div className="flex flex-1 items-center gap-1">
+            <button 
+              onClick={() => setActiveTab("updates")}
+              className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-2 rounded-full transition-all duration-200 ${
+                activeTab === "updates"
+                  ? "bg-green-50/50 border border-[#027027] shadow-sm"
+                  : "bg-transparent border border-transparent"
+              }`}
+            >
+              <div className="text-center leading-tight overflow-hidden">
+                <p className={`font-bold text-sm truncate ${activeTab === 'updates' ? 'text-[#027027]' : 'text-gray-600'}`}>All</p>
+              </div>
+            </button>
+            <button 
+              onClick={() => setActiveTab("actions")}
+              className={`flex-1 flex items-center justify-center gap-2 py-1.5 px-2 rounded-full transition-all duration-200 ${
+                activeTab === "actions"
+                  ? "bg-red-50/50 border border-red-500 shadow-sm"
+                  : "bg-transparent border border-transparent"
+              }`}
+            >
+              <div className="text-center leading-tight overflow-hidden flex items-center justify-center gap-1.5">
+                <p className={`font-bold text-sm truncate ${activeTab === 'actions' ? 'text-red-600' : 'text-gray-600'}`}>Action Forms</p>
+                {actionItems.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{actionItems.length}</span>}
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 overscroll-y-contain" style={{ paddingTop: '140px' }}>
         {activeTab === "updates" ? (
           notifications.length > 0 ? notifications.map((n, i) => (
             <div key={i} className={`p-5 rounded-3xl border ${n.unread ? 'bg-[#027027]/5 border-[#027027]/20' : 'bg-white border-gray-100'} shadow-sm flex items-start gap-4`}>
@@ -133,6 +153,7 @@ export default function Notifications() {
           )
         )}
       </div>
+    </div>
     </div>
   );
 }

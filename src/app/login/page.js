@@ -5,6 +5,7 @@ import { Phone, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
+import { normalizePhoneNumber } from "@/lib/phoneHelper";
 
 export default function Login() {
   const router = useRouter();
@@ -18,9 +19,20 @@ export default function Login() {
     const stored = localStorage.getItem("infy_user");
     if (!stored) { setError("No account found. Please sign up."); return; }
     const user = JSON.parse(stored);
-    const match = mode === "email"
-      ? user.email === form.identifier
-      : user.phone === form.identifier;
+    
+    let match = false;
+    if (mode === "email") {
+      match = user.email === form.identifier.trim();
+    } else {
+      const loginPhone = normalizePhoneNumber(form.identifier, "GH");
+      if (loginPhone.isValid) {
+        match = user.phone === loginPhone.normalized;
+      } else {
+        setError(loginPhone.error);
+        return;
+      }
+    }
+    
     if (!match || user.password !== form.password) {
       setError("Invalid credentials. Please try again.");
       return;
@@ -29,10 +41,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="fixed inset-0 max-w-md mx-auto z-50 bg-white flex flex-col overflow-hidden">
       <PageHeader title="Welcome Back" subtitle="Login to continue tracking" backHref="/onboarding" />
 
-      <div className="px-6 pt-8">
+      <div className="flex-1 overflow-y-auto px-6 pt-8 pb-10">
         {/* Toggle */}
         <div className="flex bg-gray-100 rounded-2xl p-1 mb-6">
           <button onClick={() => setMode("email")}
@@ -48,7 +60,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">
-              {mode === "email" ? "Gmail Username" : "Phone Number"}
+              {mode === "email" ? "Gmail" : "Phone Number"}
             </label>
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3.5">
               {mode === "email"
@@ -94,7 +106,7 @@ export default function Login() {
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <button type="submit"
-            className="w-full bg-[#027027] text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition text-lg mt-2">
+            className="w-full border border-[#027027] text-[#027027] font-bold py-3.5 rounded-2xl bg-transparent active:scale-95 transition-all text-[15px] flex items-center justify-center gap-2 mt-2">
             Login
           </button>
 
@@ -105,7 +117,7 @@ export default function Login() {
           </div>
 
           <button type="button"
-            className="w-full bg-white border border-gray-200 text-gray-700 font-bold py-3.5 rounded-2xl shadow-sm flex items-center justify-center gap-3 active:scale-95 transition">
+            className="w-full bg-white border border-[#027027] text-black font-normal text-sm py-3.5 rounded-2xl shadow-none flex items-center justify-center gap-3 active:scale-95 transition">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -124,3 +136,4 @@ export default function Login() {
     </div>
   );
 }
+

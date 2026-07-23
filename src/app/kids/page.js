@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Calendar, Activity, Footprints, CheckCircle, AlertCircle, Save, X, Syringe, User, Camera, Pill, TestTube } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { auth, db, storage, googleProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc } from "firebase/firestore";
@@ -66,6 +67,7 @@ function getNextDate(records, dob) {
 }
 
 export default function KidsDashboard() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [kids, setKids] = useState([]);
@@ -89,9 +91,12 @@ export default function KidsDashboard() {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
+      if (!currentUser) {
+        router.push("/login");
+      }
     });
     return () => unsubscribeAuth();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (!user) {
@@ -249,50 +254,6 @@ export default function KidsDashboard() {
   };
 
   if (authLoading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
-
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-8">
-        <span className="text-6xl mb-4">👶</span>
-        <h2 className="text-xl font-bold text-gray-700 mb-2">Welcome to Infy</h2>
-        <p className="text-gray-500 text-sm mb-6">Sign in to sync and protect your baby's records.</p>
-        
-        <div className="w-full max-w-xs bg-white p-6 rounded-3xl shadow-xl border border-gray-100">
-          <div className="flex justify-center gap-4 mb-6">
-            <button onClick={() => setLoginMethod("google")} className={`text-sm font-bold pb-2 border-b-2 transition ${loginMethod === "google" ? "border-[#027027] text-[#027027]" : "border-transparent text-gray-400"}`}>Google</button>
-            <button onClick={() => setLoginMethod("phone")} className={`text-sm font-bold pb-2 border-b-2 transition ${loginMethod === "phone" ? "border-[#027027] text-[#027027]" : "border-transparent text-gray-400"}`}>Phone</button>
-          </div>
-
-          {loginMethod === "google" ? (
-            <button onClick={handleLogin} className="w-full bg-[#027027] text-white font-bold py-3.5 rounded-2xl shadow-md hover:bg-[#014d1a] transition active:scale-95">
-              Sign In with Google
-            </button>
-          ) : (
-            <div>
-              {!confirmationResult ? (
-                <form onSubmit={handleSendOtp} className="flex flex-col gap-3">
-                  <input required type="tel" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="+1 234 567 8900" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#027027] text-sm text-center" />
-                  <button disabled={isSendingOtp} type="submit" className="w-full bg-[#027027] disabled:opacity-50 text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition">
-                    {isSendingOtp ? "Sending..." : "Send SMS Code"}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyOtp} className="flex flex-col gap-3">
-                  <input required type="text" value={otp} onChange={e => setOtp(e.target.value)} placeholder="123456" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#027027] text-sm text-center tracking-widest font-bold" />
-                  <button type="submit" className="w-full bg-[#027027] text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition">
-                    Verify Code
-                  </button>
-                  <button type="button" onClick={() => setConfirmationResult(null)} className="text-xs text-gray-500 mt-2 font-medium">Use a different number</button>
-                </form>
-              )}
-              {otpError && <p className="text-xs text-red-500 mt-3 font-medium">{otpError}</p>}
-              <div id="recaptcha-container"></div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   // Form Modal Rendering
   if (activeForm) {

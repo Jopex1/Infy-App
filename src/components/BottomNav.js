@@ -20,7 +20,7 @@ export default function BottomNav() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-primary shadow-sm"
+      className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 bg-white border-t border-primary shadow-sm"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <div className="relative flex h-[72px]">

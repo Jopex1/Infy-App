@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Menu, X, Star, Settings, Moon, Sun, Shield, Lock, Home, LogOut, UserMinus, ChevronRight, Bell, Baby, LineChart, Activity, History, Trophy, Globe, FileText, Database, HelpCircle, MessageCircle, User, UserCog, BellRing, Syringe, ChevronDown, ChevronUp, LayoutDashboard } from "lucide-react";
 
 export default function Topbar() {
@@ -91,7 +92,10 @@ export default function Topbar() {
     {
       title: "Notifications",
       icon: <Bell size={20}/>,
-      action: () => { setMenuOpen(false); router.push("/notifications"); }
+      items: [
+        { label: "View Notifications", action: () => { setMenuOpen(false); router.push("/notifications"); } },
+        { label: "Clear Notifications", action: () => { setMenuOpen(false); localStorage.removeItem("infy_notifications"); window.location.reload(); } },
+      ]
     },
     {
       title: "Logout",
@@ -103,12 +107,12 @@ export default function Topbar() {
   return (
     <>
       <header
-        className="sticky top-0 z-40 bg-[#027027] text-white flex justify-between items-center shadow-md rounded-b-[1.5rem] relative"
+        className="fixed top-0 left-0 right-0 max-w-md mx-auto z-40 bg-[#027027] text-white flex justify-between items-center shadow-md rounded-b-[1.5rem]"
         style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))', paddingBottom: '1rem', paddingLeft: '1rem', paddingRight: '1rem' }}
       >
-        <div className="relative w-28 h-9 flex items-center z-10">
+        <Link href="/" className="relative w-28 h-9 flex items-center z-10 cursor-pointer">
           <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Logo" fill sizes="112px" className="object-contain object-left" priority />
-        </div>
+        </Link>
         
         <div className="absolute left-1/2 -translate-x-1/2 font-medium text-lg mt-[calc(env(safe-area-inset-top)/2)]">
           {getPageTitle()}

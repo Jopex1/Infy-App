@@ -1,0 +1,17 @@
+{
+  "name": "Infy - Baby Tracker",
+  "short_name": "Infy",
+  "description": "Track child birth growth and childcare tips.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#027027",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/images/infy-app-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

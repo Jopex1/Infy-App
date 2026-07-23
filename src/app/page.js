@@ -18,16 +18,16 @@ export default function Home() {
   const activeKid = kids.length > 0 ? kids[activeKidIndex] : null;
 
   const tips = [
-    { title: "Tummy Time", desc: "Start tummy time early. Even 3–5 minutes a day helps strengthen neck and shoulder muscles." },
-    { title: "Sleep Routine", desc: "Establish a consistent bedtime routine. Bath, book, and bed can work wonders." },
-    { title: "Nutritional Needs", desc: "Breastmilk or formula provides all the nutrients a child needs for the first 6 months." },
-    { title: "Language Skills", desc: "Talk, read, and sing to your baby constantly to build their vocabulary." },
-    { title: "Vaccination", desc: "Keep track of scheduled immunizations. They are critical for your baby's immune defense." },
-    { title: "Motor Skills", desc: "Provide safe objects to grasp to improve hand-eye coordination." },
-    { title: "Teething Relief", desc: "A cold teething ring can soothe sore gums when those first teeth emerge." },
-    { title: "Solid Foods", desc: "Introduce solids one at a time to monitor for any potential allergies." },
-    { title: "Baby Proofing", desc: "Cover sharp edges and secure cabinets before your baby starts crawling." },
-    { title: "Self Care", desc: "Don't forget to take care of yourself. A rested parent is a happy parent!" },
+    { title: "Tummy Time", desc: "Start tummy time early. Even 3–5 minutes a day helps strengthen neck and shoulder muscles.", link: "https://raisingchildren.net.au/newborns/play-learning/play-ideas/tummy-time" },
+    { title: "Sleep Routine", desc: "Establish a consistent bedtime routine. Bath, book, and bed can work wonders.", link: "https://raisingchildren.net.au/newborns/sleep/settling-routines/newborn-sleep-routines" },
+    { title: "Nutritional Needs", desc: "Breastmilk or formula provides all the nutrients a child needs for the first 6 months.", link: "https://www.who.int/news-room/fact-sheets/detail/infant-and-young-child-feeding" },
+    { title: "Language Skills", desc: "Talk, read, and sing to your baby constantly to build their vocabulary.", link: "https://raisingchildren.net.au/babies/development/language-development/language-3-12-months" },
+    { title: "Vaccination", desc: "Keep track of scheduled immunizations. They are critical for your baby's immune defense.", link: "https://www.cdc.gov/vaccines/by-age/index.html" },
+    { title: "Motor Skills", desc: "Provide safe objects to grasp to improve hand-eye coordination.", link: "https://www.unicef.org/parenting/child-development/baby-milestones-your-child-active-play" },
+    { title: "Teething Relief", desc: "A cold teething ring can soothe sore gums when those first teeth emerge.", link: "https://www.texaschildrens.org/content/wellness/teething-tips-new-information-parents" },
+    { title: "Solid Foods", desc: "Introduce solids one at a time to monitor for any potential allergies.", link: "https://www.nhs.uk/baby/weaning-and-feeding/babys-first-solid-foods/" },
+    { title: "Baby Proofing", desc: "Cover sharp edges and secure cabinets before your baby starts crawling.", link: "https://www.unicef.org/parenting/safety/how-to-babyproof-your-home" },
+    { title: "Self Care", desc: "Don't forget to take care of yourself. A rested parent is a happy parent!", link: "https://www.unicef.org/parenting/mental-health/parent-self-care-tips" },
   ];
 
   return (
@@ -40,7 +40,7 @@ export default function Home() {
 
       {/* Visual Guide Section */}
       <section className="px-4 border-t border-gray-100 pt-4">
-        <h2 className="text-lg font-black text-gray-800 mb-3">Your Visual Guide to Parenting</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">Your Visual Guide to Parenting</h2>
         <div className="flex bg-orange-50 rounded-[2rem] p-5 items-center shadow-sm border border-orange-100 gap-4">
           <div className="flex-1">
             <p className="text-sm text-gray-600 leading-relaxed mb-4">
@@ -62,15 +62,15 @@ export default function Home() {
 
       {/* My Baby's Dashboard CTA */}
       <section className="px-4">
-        <div className="bg-green-50 border border-green-200 rounded-[20px] p-5 text-center shadow-sm relative overflow-hidden">
+        <div className="bg-green-50 border border-green-200 rounded-[20px] p-5 shadow-sm relative overflow-hidden">
           <div className="absolute -bottom-6 -right-6 text-[#027027] opacity-10 pointer-events-none">
             <Baby size={120} />
           </div>
 
-          <div className="bg-white border border-green-200 rounded-[20px] p-4 shadow-sm mb-5 relative z-10 text-justify">
+          <div className="bg-white border border-green-200 rounded-[20px] p-4 px-6 shadow-sm mb-5 relative z-10">
             <div className="text-sm text-gray-600">
-              <div className="text-center mb-2"><strong className="text-[#027027] text-[17px]">Keep Track of Every Milestone</strong></div>
-              Everything you need to monitor your child's progress, immunizations, weighing schedules, and personalized health details all in one place.
+              <strong className="text-[#027027] text-[15px] block mb-1">Keep Track of Every Milestone</strong>
+              Monitor your child's growth, weighing schedule, vaccinations, and important health information all in one place.
             </div>
           </div>
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function PageHeader({ title, subtitle, backHref = "/" }) {
   return (
-    <div className="bg-[#027027] pt-10 pb-7 px-6 rounded-b-[2.5rem] relative sticky top-0 z-50">
+    <div className="bg-[#027027] pt-10 pb-7 px-6 rounded-b-[2.5rem] relative sticky top-0 z-50 shadow-md shrink-0">
       <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-5 pointer-events-none" style={{mixBlendMode: 'overlay'}}>
         <Image src="/icons/infy_wordmark_mono_1.png" alt="watermark" width={200} height={200} className="object-contain" />
       </div>
@@ -23,3 +23,4 @@ export default function PageHeader({ title, subtitle, backHref = "/" }) {
     </div>
   );
 }
+
