@@ -9,9 +9,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/images/infy-app-icon.jpg",
+      "src": "/images/infy-app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/infy-app-icon.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }

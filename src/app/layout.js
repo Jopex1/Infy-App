@@ -6,8 +6,8 @@ export const metadata = {
   title: "Infy - Baby Tracker",
   description: "Track child birth growth and childcare tips.",
   icons: {
-    icon: "/images/infy-app-icon.jpg",
-    apple: "/images/infy-app-icon.jpg",
+    icon: "/images/infy-app-icon.png",
+    apple: "/images/infy-app-icon.png",
   },
   manifest: "/manifest.json",
 };
