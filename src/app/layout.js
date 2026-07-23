@@ -25,7 +25,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <Topbar />
         <main 
           className="max-w-md mx-auto min-h-screen bg-background relative shadow-xl sm:border-x border-gray-200"
