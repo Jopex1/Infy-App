@@ -3,46 +3,47 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   try {
     const { messages } = await req.json();
-    const apiKey = process.env.GEMINI_API_KEY?.replace(/['"]/g, '').trim();
+    const apiKey = process.env.GROQ_API_KEY?.replace(/['"]/g, '').trim();
 
     if (!apiKey) {
       return NextResponse.json({
-        reply: "Hello! I am Infy AI Doctor. To activate my full AI powers, please add your free GEMINI_API_KEY to your environment variables in Netlify or .env.local!"
+        reply: "Hello! I am Infy AI Doctor. Please add your free GROQ_API_KEY to your environment variables in Netlify to activate my powers!"
       });
     }
 
-    // Format conversation history for Gemini API
-    const contents = [
+    // Format conversation history for Groq (OpenAI compatible)
+    const formattedMessages = [
       {
-        role: "user",
-        parts: [{ text: "System Instruction: You are Infy AI Doctor, a compassionate, expert virtual pediatric and child-care consultant in the Infy Baby Tracker app. Provide warm, accurate, easy-to-understand advice on newborn care, baby growth, nutrition, sleep, and vaccinations. Keep responses concise and friendly (under 120 words). Always remind parents to consult a qualified pediatrician for emergency or severe medical symptoms." }]
-      },
-      {
-        role: "model",
-        parts: [{ text: "Understood! I am ready to assist parents with warm, concise, and expert guidance on child care as the Infy AI Doctor." }]
+        role: "system",
+        content: "You are Infy AI Doctor, a compassionate, expert virtual pediatric and child-care consultant in the Infy Baby Tracker app. Provide warm, accurate, easy-to-understand advice on newborn care, baby growth, nutrition, sleep, and vaccinations. Keep responses concise and friendly (under 120 words). Always remind parents to consult a qualified pediatrician for emergency or severe medical symptoms."
       },
       ...messages.map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }]
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text
       }))
     ];
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents })
-      }
-    );
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: formattedMessages,
+        temperature: 0.7,
+        max_tokens: 200
+      })
+    });
 
     const data = await response.json();
 
-    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-      const reply = data.candidates[0].content.parts[0].text;
+    if (data.choices && data.choices[0]?.message?.content) {
+      const reply = data.choices[0].message.content;
       return NextResponse.json({ reply });
     } else {
-      console.error("Gemini API Error:", data);
+      console.error("Groq API Error:", data);
       return NextResponse.json({
         reply: `API Error: ${data.error?.message || JSON.stringify(data)}`
       });
