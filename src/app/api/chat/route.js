@@ -44,13 +44,13 @@ export async function POST(req) {
     } else {
       console.error("Gemini API Error:", data);
       return NextResponse.json({
-        reply: "I am having trouble connecting to my medical database right now. Please try again in a moment!"
+        reply: `API Error: ${data.error?.message || JSON.stringify(data)}`
       });
     }
   } catch (error) {
     console.error("Chat API route error:", error);
     return NextResponse.json(
-      { reply: "An error occurred while generating a response. Please check your internet connection." },
+      { reply: `Fetch Error: ${error.message}` },
       { status: 500 }
     );
   }
