@@ -282,9 +282,13 @@ export default function ChatPage() {
                 <div className={`max-w-[80%] rounded-2xl p-3.5 shadow-sm text-sm leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-[#027027] text-white rounded-tr-sm'
-                    : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
+                    : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm chat-ai-response'
                 }`}>
-                  <p>{msg.text}</p>
+                  {msg.sender === 'user' ? (
+                    <p>{msg.text}</p>
+                  ) : (
+                    <div dangerouslySetInnerHTML={{ __html: msg.text }} />
+                  )}
                   {msg.time && <p className={`text-[10px] mt-1.5 ${msg.sender === 'user' ? 'text-green-200' : 'text-gray-400'}`}>
                     {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>}
