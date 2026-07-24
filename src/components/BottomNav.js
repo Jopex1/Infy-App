@@ -9,7 +9,7 @@ export default function BottomNav() {
   if (['/onboarding', '/login', '/signup'].includes(pathname)) return null;
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Home' },
+    { path: '/home', icon: Home, label: 'Home' },
     { path: '/kids', icon: Baby, label: 'Dashboard' },
     { path: '/chat', icon: MessageSquareText, label: 'Contact' },
     { path: '/notifications', icon: Bell, label: 'Notifications' },
@@ -41,8 +41,8 @@ export default function BottomNav() {
               style={{ width: '20%' }}
               className={`relative z-10 flex flex-col items-center justify-center gap-1 ${isActive ? 'text-white' : 'text-primary'}`}
             >
-              <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[10px] font-medium leading-none">{item.label}</span>
+              <item.icon size={26} strokeWidth={isActive ? 2 : 1.5} />
+              <span className="text-[10px] font-normal leading-none">{item.label}</span>
             </Link>
           );
         })}

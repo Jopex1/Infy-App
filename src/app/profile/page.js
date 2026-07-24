@@ -27,7 +27,7 @@ export default function Profile() {
         avatar: u.avatar || null,
       });
     } else {
-      router.push("/login");
+      router.push("/onboarding");
     }
   }, [router]);
 

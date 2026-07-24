@@ -28,7 +28,7 @@ export default function Topbar() {
 
   const getPageTitle = () => {
     switch (pathname) {
-      case '/': return 'Home';
+      case '/home': return 'Home';
       case '/kids': return 'Dashboard';
       case '/chat': return 'Chat';
       case '/notifications': return 'Notifications';
@@ -126,7 +126,7 @@ export default function Topbar() {
       {menuOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-50 w-4/5 max-w-sm flex pointer-events-auto bg-gray-50 animate-in slide-in-from-right duration-300 flex-col shadow-2xl overflow-hidden">
+          <div className="fixed inset-y-0 right-0 z-50 w-4/5 max-w-sm flex pointer-events-auto bg-gray-50/90 backdrop-blur-sm animate-in slide-in-from-right duration-300 flex-col shadow-2xl overflow-hidden">
             {/* Watermark Logo */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-5">
                <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Watermark" width={250} height={250} style={{width: 'auto', height: 'auto'}} className="object-contain" />
@@ -150,7 +150,7 @@ export default function Topbar() {
                     >
                       <div className="flex items-center gap-3 text-gray-700">
                         <div className="text-[#027027]">{section.icon}</div>
-                        <span className="font-bold text-[15px]">{section.title}</span>
+                        <span className="font-normal text-[15px]">{section.title}</span>
                       </div>
                       {!section.action && (expandedSection === idx ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />)}
                     </button>

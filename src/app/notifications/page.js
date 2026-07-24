@@ -2,6 +2,9 @@
 import { BellRing, CheckCircle2, AlertCircle, Calendar, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { auth, db } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 function getDaysToNext(records, dob) {
   if (!dob) return 0;
@@ -21,11 +24,30 @@ export default function Notifications() {
   const [activeTab, setActiveTab] = useState("updates");
   const [notifications, setNotifications] = useState([]);
   const [actionItems, setActionItems] = useState([]);
+  const [kids, setKids] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const kidsData = localStorage.getItem("infy_kids");
-    const kids = kidsData ? JSON.parse(kidsData) : [];
-    
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setKids([]);
+      return;
+    }
+    const q = query(collection(db, "children"), where("userId", "==", user.uid));
+    const unsubscribeDb = onSnapshot(q, (snapshot) => {
+      const kidsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setKids(kidsData);
+    });
+    return () => unsubscribeDb();
+  }, [user]);
+
+  useEffect(() => {
     // Notifications Generation
     const defaultNotifs = [
        { title: "Successful Login", desc: "You have successfully signed in to Infy from a new device.", time: "Just now", unread: true },
@@ -50,6 +72,7 @@ export default function Notifications() {
          if (vaccineDaysLeft === 0) {
             actions.push({
                type: 'vaccine',
+               kidId: k.id,
                kidName: k.name,
                title: "Vaccination Due",
                desc: `It's time for ${k.name}'s next vaccination. Visit the clinic soon.`,
@@ -59,6 +82,7 @@ export default function Notifications() {
          if (weighingDaysLeft === 0) {
             actions.push({
                type: 'weighing',
+               kidId: k.id,
                kidName: k.name,
                title: "Weighing Due",
                desc: `Please record a new weight for ${k.name} to keep the growth chart updated.`,
@@ -70,7 +94,7 @@ export default function Notifications() {
 
     setNotifications(defaultNotifs);
     setActionItems(actions);
-  }, []);
+  }, [kids]);
 
   return (
     <div className="flex flex-col h-[calc(100dvh-72px)] overflow-y-auto overscroll-y-contain animate-in fade-in slide-in-from-bottom-4 duration-500">

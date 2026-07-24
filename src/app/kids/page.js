@@ -92,7 +92,7 @@ export default function KidsDashboard() {
       setUser(currentUser);
       setAuthLoading(false);
       if (!currentUser) {
-        router.push("/login");
+        router.push("/onboarding");
       }
     });
     return () => unsubscribeAuth();
@@ -624,13 +624,13 @@ export default function KidsDashboard() {
         <h2 className="text-[#027027] text-sm font-bold mb-3">Action Forms</h2>
         <div className="space-y-3">
 
-          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${vaccineDaysLeft === 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
+          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${vaccineDaysLeft === 0 ? 'bg-red-50 border-red-200' : vaccineDaysLeft === 1 ? 'bg-green-50 border-green-300' : 'bg-white border-gray-100'}`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${vaccineDaysLeft === 0 ? 'bg-red-100 text-red-600' : 'bg-green-50 text-[#027027]'}`}>
+              <div className={`p-2 rounded-full ${vaccineDaysLeft === 0 ? 'bg-red-100 text-red-600' : vaccineDaysLeft === 1 ? 'bg-green-100 text-[#027027]' : 'bg-green-50 text-[#027027]'}`}>
                 <Syringe size={18} />
               </div>
               <div>
-                <span className={`text-sm font-bold ${vaccineDaysLeft === 0 ? 'text-red-900' : 'text-gray-800'}`}>Vaccination</span>
+                <span className={`text-sm font-bold ${vaccineDaysLeft === 0 ? 'text-red-900' : vaccineDaysLeft === 1 ? 'text-[#027027]' : 'text-gray-800'}`}>Vaccination</span>
                 {activeKid.vaccineRecords?.length > 0 && (
                   <span className="block text-[10px] text-[#027027] mt-1 font-semibold">
                     Last: {activeKid.vaccineRecords[activeKid.vaccineRecords.length-1].vaccineName}
@@ -638,24 +638,36 @@ export default function KidsDashboard() {
                 )}
               </div>
             </div>
-            <button onClick={() => openForm("vaccine")} className={`${vaccineDaysLeft === 0 ? 'bg-[#027027] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm`}>
-              Open Form
-            </button>
+            {vaccineDaysLeft === 0 ? (
+              <span className="text-xs font-bold text-red-600 px-4 py-2 rounded-xl bg-red-100">Finished</span>
+            ) : vaccineDaysLeft === 1 ? (
+              <button onClick={() => openForm("vaccine")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
+                Open Form
+              </button>
+            ) : (
+              <span className="text-xs font-bold text-gray-400 px-4 py-2 rounded-xl bg-gray-100">{vaccineDaysLeft} days</span>
+            )}
           </div>
 
-          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${weighingDaysLeft === 0 ? 'bg-red-50 border-red-200' : 'bg-white border-gray-100'}`}>
+          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${weighingDaysLeft === 0 ? 'bg-red-50 border-red-200' : weighingDaysLeft === 1 ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-100'}`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${weighingDaysLeft === 0 ? 'bg-red-100 text-red-600' : 'bg-yellow-50 text-yellow-600'}`}>
+              <div className={`p-2 rounded-full ${weighingDaysLeft === 0 ? 'bg-red-100 text-red-600' : weighingDaysLeft === 1 ? 'bg-yellow-100 text-yellow-600' : 'bg-yellow-50 text-yellow-600'}`}>
                 <Activity size={18} />
               </div>
               <div>
-                <span className={`text-sm font-bold ${weighingDaysLeft === 0 ? 'text-red-900' : 'text-gray-800'}`}>Weighing</span>
+                <span className={`text-sm font-bold ${weighingDaysLeft === 0 ? 'text-red-900' : weighingDaysLeft === 1 ? 'text-yellow-700' : 'text-gray-800'}`}>Weighing</span>
                 {activeKid.weight && <span className="block text-[10px] text-[#027027] mt-1 font-semibold">Last Weight: {activeKid.weight} kg</span>}
               </div>
             </div>
-            <button onClick={() => openForm("weighing")} className={`${weighingDaysLeft === 0 ? 'bg-[#027027] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'} text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm`}>
-              Open Form
-            </button>
+            {weighingDaysLeft === 0 ? (
+              <span className="text-xs font-bold text-red-600 px-4 py-2 rounded-xl bg-red-100">Finished</span>
+            ) : weighingDaysLeft === 1 ? (
+              <button onClick={() => openForm("weighing")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
+                Open Form
+              </button>
+            ) : (
+              <span className="text-xs font-bold text-gray-400 px-4 py-2 rounded-xl bg-gray-100">{weighingDaysLeft} days</span>
+            )}
           </div>
 
           <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition bg-white border-gray-100`}>

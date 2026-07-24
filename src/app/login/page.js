@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import { normalizePhoneNumber } from "@/lib/phoneHelper";
+import { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider } from "@/lib/firebase";
 
 export default function Login() {
   const router = useRouter();
@@ -14,36 +15,43 @@ export default function Login() {
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const stored = localStorage.getItem("infy_user");
-    if (!stored) { setError("No account found. Please sign up."); return; }
-    const user = JSON.parse(stored);
     
-    let match = false;
-    if (mode === "email") {
-      match = user.email === form.identifier.trim();
-    } else {
-      const loginPhone = normalizePhoneNumber(form.identifier, "GH");
-      if (loginPhone.isValid) {
-        match = user.phone === loginPhone.normalized;
-      } else {
-        setError(loginPhone.error);
-        return;
-      }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, form.identifier, form.password);
+      const user = userCredential.user;
+      
+      localStorage.setItem("infy_user", JSON.stringify({ 
+        uid: user.uid,
+        email: user.email
+      }));
+      
+      router.push("/");
+    } catch (error) {
+      setError(error.message);
     }
-    
-    if (!match || user.password !== form.password) {
-      setError("Invalid credentials. Please try again.");
-      return;
-    }
-    router.push("/");
   };
 
-  const handleGoogleLogin = () => {
-    const fakeGoogleUser = { email: "user@gmail.com", firstName: "Google", lastName: "User", phone: "0248000000" };
-    localStorage.setItem("infy_user", JSON.stringify(fakeGoogleUser));
-    router.push("/");
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      localStorage.setItem("infy_user", JSON.stringify({ 
+        uid: user.uid,
+        email: user.email,
+        firstName: user.displayName?.split(' ')[0] || '',
+        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+        phone: '',
+        location: '',
+        avatar: user.photoURL 
+      }));
+      
+      router.push("/");
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (

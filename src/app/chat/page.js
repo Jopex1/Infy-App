@@ -42,6 +42,26 @@ export default function ChatPage() {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) setSessions(JSON.parse(stored));
+
+    // Check for video from explore page
+    const videoData = localStorage.getItem("infy_ai_video");
+    if (videoData) {
+      const video = JSON.parse(videoData);
+      localStorage.removeItem("infy_ai_video");
+      
+      const userMsg = { 
+        id: Date.now(), 
+        text: `I'd like to learn about this video: ${video.link}\n\nTitle: ${video.title}\nDescription: ${video.description}`, 
+        sender: 'user', 
+        time: new Date().toISOString() 
+      };
+      
+      setMessages([WELCOME, userMsg]);
+      saveSession([WELCOME, userMsg]);
+      
+      // Trigger AI response
+      handleSend(`I'd like to learn about this video: ${video.link}\n\nTitle: ${video.title}\nDescription: ${video.description}`);
+    }
   }, []);
 
   useEffect(() => {
@@ -54,7 +74,7 @@ export default function ChatPage() {
     const session = {
       id: activeSession || Date.now().toString(),
       date: new Date().toISOString(),
-      preview: msgs.find(m => m.sender === 'user')?.text || "New chat",
+      preview: msgs.find(m => m.sender === 'user')?.text.substring(0, 35) + (msgs.find(m => m.sender === 'user')?.text.length > 35 ? "..." : "") || "New Consultation",
       messages: msgs,
     };
     setSessions(prev => {
@@ -287,7 +307,7 @@ export default function ChatPage() {
                   {msg.sender === 'user' ? (
                     <p>{msg.text}</p>
                   ) : (
-                    <div dangerouslySetInnerHTML={{ __html: msg.text }} />
+                    <p>{msg.text.replace(/\*\*/g, '')}</p>
                   )}
                   {msg.time && <p className={`text-[10px] mt-1.5 ${msg.sender === 'user' ? 'text-green-200' : 'text-gray-400'}`}>
                     {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

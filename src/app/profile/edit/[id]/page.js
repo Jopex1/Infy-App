@@ -48,13 +48,6 @@ export default function EditChildPage() {
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 flex flex-col pb-safe animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <header className="bg-white border-b px-4 py-4 flex items-center shadow-sm sticky top-0 z-10">
-        <button onClick={() => router.back()} className="mr-4 text-[#027027] p-2 -ml-2 rounded-full hover:bg-gray-100 transition">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="font-semibold text-gray-900 text-lg">Edit Child Profile</h1>
-      </header>
-
       <div className="p-4 mt-2">
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
