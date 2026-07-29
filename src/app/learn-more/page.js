@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useChildren } from "@/hooks/useChildren";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 function getGrowthStage(dob) {
@@ -21,8 +22,8 @@ const stageData = {
     badge: "bg-pink-100 text-pink-700",
     description: "Babies spend most of their time sleeping, rely on reflexes such as sucking and rooting, and begin recognising familiar voices and faces.",
     videos: [
-      { title: "Newborn Baby Care Essentials", id: "JvmTlvBUhuQ" },
-      { title: "Understanding Your Newborn", id: "9RVvxFNhHdI" },
+      { id: "JvmTlvBUhuQ" },
+      { id: "9RVvxFNhHdI" },
     ],
     sections: [
       { title: "Sleep & Rest", content: "Newborns sleep 14–17 hours a day in short cycles. Always place baby on their back to sleep on a firm surface." },
@@ -38,8 +39,8 @@ const stageData = {
     badge: "bg-blue-100 text-blue-700",
     description: "Babies learn to roll over, sit, crawl and stand. They begin babbling, saying words like 'mama' and 'dada', and become aware of strangers.",
     videos: [
-      { title: "Baby Development 3-12 Months", id: "3F4XH7ACWOY" },
-      { title: "Infant Growth & Milestones", id: "Oe0hfVNfLAI" },
+      { id: "3F4XH7ACWOY" },
+      { id: "Oe0hfVNfLAI" },
     ],
     sections: [
       { title: "Motor Skills", content: "Rolls over at 4–5 months, sits without support at 6–7 months. Starts crawling around 8–9 months. May begin pulling to stand near 9–12 months." },
@@ -55,8 +56,8 @@ const stageData = {
     badge: "bg-green-100 text-green-700",
     description: "Children begin walking independently, become highly active, develop speech rapidly and start showing independence.",
     videos: [
-      { title: "Toddler Development Guide", id: "3F4XH7ACWOY" },
-      { title: "Raising Healthy Toddlers", id: "ApXoWvfEYVU" },
+      { id: "3F4XH7ACWOY" },
+      { id: "VVmMK4ZcPxY" },
     ],
     sections: [
       { title: "Movement & Activity", content: "Walks independently by 12–15 months. Runs, climbs, and becomes highly active. Hand-eye coordination improves rapidly. Start toddler-proofing your home." },
@@ -89,6 +90,7 @@ function Accordion({ title, content }) {
 
 export default function LearnMore() {
   const [stageLabel, setStageLabel] = useState("Newborn");
+  const [videoTitles, setVideoTitles] = useState({});
 
   useEffect(() => {
     const kids = localStorage.getItem("infy_kids");
@@ -101,7 +103,20 @@ export default function LearnMore() {
     }
   }, []);
 
+  useEffect(() => {
+    const ids = [...new Set(Object.values(stageData).flatMap((s) => s.videos.map((v) => v.id)))];
+    fetch("/api/youtube", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    })
+      .then((res) => res.json())
+      .then((data) => setVideoTitles(data.titles || {}))
+      .catch(() => {});
+  }, []);
+
   const stage = stageData[stageLabel];
+  const getTitle = (video) => videoTitles[video.id] || "Loading title…";
 
   return (
     <div className="min-h-screen pb-safe">
@@ -138,12 +153,12 @@ export default function LearnMore() {
             {stage.videos.map((v, i) => (
               <div key={i} className="rounded-3xl overflow-hidden shadow-sm border border-gray-100">
                 <div className="bg-gray-50 px-4 py-2.5">
-                  <p className="text-sm font-bold text-gray-700">{v.title}</p>
+                  <p className="text-sm font-bold text-gray-700">{getTitle(v)}</p>
                 </div>
                 <div className="aspect-video w-full">
                   <iframe
                     src={`https://www.youtube.com/embed/${v.id}?controls=1&rel=0&modestbranding=1`}
-                    title={v.title}
+                    title={getTitle(v)}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     referrerPolicy="no-referrer-when-downgrade"

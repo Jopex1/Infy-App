@@ -84,6 +84,41 @@ body {
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 1rem);
 }
 
+/* Fixed bottom nav — stays pinned on all devices */
+.bottom-nav-fixed {
+  position: fixed !important;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes navActiveFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.nav-active-fade {
+  animation: navActiveFadeIn 0.4s ease-in-out;
+  transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+.chat-ai-response strong {
+  color: #027027;
+}
+
+.chat-ai-response ul {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+}
+
+.chat-ai-response a {
+  color: #027027;
+  text-decoration: underline;
+}
+
 /* Apply safe bottom automatically to common page wrappers */
 main > div,
 main > section {

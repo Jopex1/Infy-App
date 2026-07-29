@@ -19,20 +19,24 @@ export default function BottomNav() {
   const activeIndex = navItems.findIndex(item => item.path === pathname);
 
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-50 bg-white border-t border-primary shadow-sm"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    <nav
+      className="bottom-nav-fixed fixed bottom-0 left-0 right-0 max-w-md mx-auto z-[100] bg-white border-t border-primary shadow-lg"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        transform: 'translateZ(0)',
+      }}
+      aria-label="Main navigation"
     >
       <div className="relative flex h-[72px]">
-        {/* Sliding active background */}
         {activeIndex >= 0 && (
           <div
-            className="absolute top-0 h-full bg-primary transition-all duration-300 ease-in-out pointer-events-none"
+            key={activeIndex}
+            className="absolute top-0 h-full bg-primary nav-active-fade pointer-events-none"
             style={{ width: '20%', left: `${activeIndex * 20}%` }}
           />
         )}
 
-        {navItems.map((item, i) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.path;
           return (
             <Link
@@ -47,6 +51,6 @@ export default function BottomNav() {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }

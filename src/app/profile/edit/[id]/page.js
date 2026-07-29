@@ -1,50 +1,56 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useRef } from "react";
-import { Save, ArrowLeft, Trash2, Camera, User } from "lucide-react";
-import Link from "next/link";
+import { Save, Trash2, Camera, User } from "lucide-react";
+import { useChildren } from "@/hooks/useChildren";
 
 export default function EditChildPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id;
   const fileRef = useRef(null);
-  
-  const [kids, setKids] = useState([]);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const { kids, updateChild, deleteChild, loading } = useChildren();
   const [kid, setKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: null });
 
   useEffect(() => {
-    const stored = localStorage.getItem("infy_kids");
-    if (stored) {
-      const parsedKids = JSON.parse(stored);
-      setKids(parsedKids);
-      const targetKid = parsedKids.find(k => k.id === id);
-      if (targetKid) {
-        setKid(targetKid);
-      }
+    const targetKid = kids.find((k) => k.id === id);
+    if (targetKid) {
+      setKid(targetKid);
     }
-  }, [id]);
+  }, [kids, id]);
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    const updatedKids = kids.map(k => k.id === id ? { ...k, ...kid } : k);
-    localStorage.setItem("infy_kids", JSON.stringify(updatedKids));
-    router.push("/profile");
+    setSaving(true);
+    try {
+      await updateChild(id, kid, avatarFile);
+      router.push("/profile");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this child's profile?")) {
-      const updatedKids = kids.filter(k => k.id !== id);
-      localStorage.setItem("infy_kids", JSON.stringify(updatedKids));
+      await deleteChild(id);
       router.push("/profile");
     }
   };
 
   const handleAvatarChange = (e) => {
     const f = e.target.files[0];
-    if (f) setKid(prev => ({...prev, avatar: URL.createObjectURL(f)}));
+    if (f) {
+      setAvatarFile(f);
+      setKid((prev) => ({ ...prev, avatar: URL.createObjectURL(f) }));
+    }
   };
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500">Loading...</div>;
+  }
 
   return (
     <div className="min-h-[100dvh] bg-gray-50 flex flex-col pb-safe animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -108,8 +114,8 @@ export default function EditChildPage() {
           </div>
 
           <div className="flex gap-3 mt-4">
-            <button type="submit" className="flex-1 bg-[#027027] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition text-sm">
-              <Save size={18} /> Save Changes
+            <button type="submit" disabled={saving} className="flex-1 bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition text-sm">
+              <Save size={18} /> {saving ? "Saving..." : "Save Changes"}
             </button>
             <button type="button" onClick={handleDelete} className="bg-red-50 text-red-600 font-bold px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm border border-red-100 hover:bg-red-100 active:scale-95 transition">
               <Trash2 size={20} />

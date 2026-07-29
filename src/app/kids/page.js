@@ -107,6 +107,7 @@ export default function KidsDashboard() {
     const unsubscribeDb = onSnapshot(q, (snapshot) => {
       const kidsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setKids(kidsData);
+      localStorage.setItem("infy_kids", JSON.stringify(kidsData));
     });
     return () => unsubscribeDb();
   }, [user]);
@@ -710,6 +711,67 @@ export default function KidsDashboard() {
 
         </div>
       </div>
+
+      {isAdding && activeKid && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-y-auto max-h-[90vh] pb-safe">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-[#027027]">Add Child</h2>
+              <button onClick={() => setIsAdding(false)} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
+            </div>
+            <form onSubmit={handleAdd} className="flex flex-col gap-3">
+              <div className="flex justify-center mb-2">
+                <button type="button" onClick={() => fileRef.current.click()} className="relative">
+                  <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
+                    {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={24} className="text-[#027027]" />}
+                  </div>
+                </button>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
+                <input required type="text" value={newKid.name} onChange={e => setNewKid({...newKid, name: e.target.value})}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Child's name" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Date of Birth</label>
+                  <input required type="date" value={newKid.dob} onChange={e => setNewKid({...newKid, dob: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Gender</label>
+                  <select value={newKid.gender} onChange={e => setNewKid({...newKid, gender: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
+                    <option>Girl</option>
+                    <option>Boy</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Place of Birth</label>
+                <input type="text" value={newKid.placeBirth} onChange={e => setNewKid({...newKid, placeBirth: e.target.value})}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Hospital / City" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Birth Weight (kg)</label>
+                  <input type="number" step="0.1" value={newKid.weight} onChange={e => setNewKid({...newKid, weight: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 3.5" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Height (cm)</label>
+                  <input type="number" step="0.1" value={newKid.height} onChange={e => setNewKid({...newKid, height: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 50" />
+                </div>
+              </div>
+              <button disabled={isSaving} type="submit" className="w-full mt-2 bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                {isSaving ? "Saving to Cloud..." : <><Save size={18} /> Save Child Profile</>}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

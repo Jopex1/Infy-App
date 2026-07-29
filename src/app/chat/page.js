@@ -7,6 +7,11 @@ import Image from 'next/image';
 const STORAGE_KEY = "infy_chat_sessions";
 const WELCOME = { id: 1, text: "Hello! I am your Infy AI Doctor. How can I help you and your baby today?", sender: 'doctor', time: new Date().toISOString() };
 
+function formatAiReply(text) {
+  if (!text) return "";
+  return text.replace(/\*\*/g, "").replace(/\*/g, "");
+}
+
 function getDayLabel(dateStr) {
   const date = new Date(dateStr);
   const today = new Date();
@@ -38,30 +43,35 @@ export default function ChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const pendingVideoRef = useRef(null);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) setSessions(JSON.parse(stored));
 
-    // Check for video from explore page
     const videoData = localStorage.getItem("infy_ai_video");
     if (videoData) {
       const video = JSON.parse(videoData);
       localStorage.removeItem("infy_ai_video");
-      
-      const userMsg = { 
-        id: Date.now(), 
-        text: `I'd like to learn about this video: ${video.link}\n\nTitle: ${video.title}\nDescription: ${video.description}`, 
-        sender: 'user', 
-        time: new Date().toISOString() 
-      };
-      
-      setMessages([WELCOME, userMsg]);
-      saveSession([WELCOME, userMsg]);
-      
-      // Trigger AI response
-      handleSend(`I'd like to learn about this video: ${video.link}\n\nTitle: ${video.title}\nDescription: ${video.description}`);
+      pendingVideoRef.current = video;
     }
+  }, []);
+
+  useEffect(() => {
+    if (!pendingVideoRef.current) return;
+    const video = pendingVideoRef.current;
+    pendingVideoRef.current = null;
+
+    const userMsg = {
+      id: Date.now(),
+      text: `I'd like to learn about this video: ${video.link}\n\nTitle: ${video.title}`,
+      sender: "user",
+      time: new Date().toISOString(),
+    };
+
+    const initialMessages = [WELCOME, userMsg];
+    setMessages(initialMessages);
+    sendToAi(initialMessages, userMsg.text);
   }, []);
 
   useEffect(() => {
@@ -114,32 +124,48 @@ export default function ChatPage() {
     startNewChat();
   };
 
-  const handleSend = async (overrideText) => {
-    const textToSend = typeof overrideText === 'string' ? overrideText : input;
-    if (!textToSend.trim() || loading) return;
-    const userMsg = { id: Date.now(), text: textToSend, sender: 'user', time: new Date().toISOString() };
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
-    setInput('');
+  const sendToAi = async (currentMessages, textToSend) => {
     setLoading(true);
-
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages }),
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: currentMessages }),
       });
       const data = await res.json();
-      const reply = { id: Date.now() + 1, text: data.reply || "How else can I assist?", sender: 'doctor', time: new Date().toISOString() };
-      const finalMessages = [...updatedMessages, reply];
+      if (!res.ok) {
+        throw new Error(data.error || "AI service unavailable");
+      }
+      const replyText = formatAiReply(data.reply || "How else can I assist?");
+      const reply = { id: Date.now() + 1, text: replyText, sender: "doctor", time: new Date().toISOString() };
+      const finalMessages = [...currentMessages, reply];
       setMessages(finalMessages);
       saveSession(finalMessages);
-    } catch {
-      const errMsg = { id: Date.now() + 1, text: "I'm having trouble connecting right now. Please try again.", sender: 'doctor', time: new Date().toISOString() };
-      setMessages(prev => [...prev, errMsg]);
+    } catch (err) {
+      const errMsg = {
+        id: Date.now() + 1,
+        text: err.message || "I'm having trouble connecting right now. Please try again.",
+        sender: "doctor",
+        time: new Date().toISOString(),
+      };
+      setMessages((prev) => {
+        const updated = [...prev, errMsg];
+        saveSession(updated);
+        return updated;
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSend = async (overrideText) => {
+    const textToSend = typeof overrideText === "string" ? overrideText : input;
+    if (!textToSend.trim() || loading) return;
+    const userMsg = { id: Date.now(), text: textToSend, sender: "user", time: new Date().toISOString() };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    setInput("");
+    await sendToAi(updatedMessages, textToSend);
   };
 
   const handleMediaClick = () => {
@@ -307,7 +333,10 @@ export default function ChatPage() {
                   {msg.sender === 'user' ? (
                     <p>{msg.text}</p>
                   ) : (
-                    <p>{msg.text.replace(/\*\*/g, '')}</p>
+                    <div
+                      className="chat-ai-response prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{ __html: formatAiReply(msg.text) }}
+                    />
                   )}
                   {msg.time && <p className={`text-[10px] mt-1.5 ${msg.sender === 'user' ? 'text-green-200' : 'text-gray-400'}`}>
                     {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

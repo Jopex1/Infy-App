@@ -2,17 +2,13 @@
 import Carousel from "@/components/Carousel";
 import { CalendarCheck, Activity, Footprints, Grid, ChevronRight, Syringe, Baby } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
+import { useChildren } from "@/hooks/useChildren";
 
 export default function Home() {
-  const [kids, setKids] = useState([]);
+  const { kids } = useChildren();
   const [activeKidIndex, setActiveKidIndex] = useState(0);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("infy_kids");
-    if (stored) setKids(JSON.parse(stored));
-  }, []);
 
   const nextKid = () => setActiveKidIndex((prev) => (prev + 1) % kids.length);
   const activeKid = kids.length > 0 ? kids[activeKidIndex] : null;

@@ -2,19 +2,20 @@
 import { useState, useEffect, useRef } from "react";
 import { Edit, Mail, Phone, MapPin, Plus, User, Camera, Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useChildren } from "@/hooks/useChildren";
 
 export default function Profile() {
   const router = useRouter();
-  const [kids, setKids] = useState([]);
+  const { kids, addChild } = useChildren();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [saving, setSaving] = useState(false);
   const [user, setUser] = useState({ firstName: "", lastName: "", email: "", phone: "", location: "", avatar: null });
   const fileRef = useRef();
 
   useEffect(() => {
-    const stored = localStorage.getItem("infy_kids");
-    if (stored) setKids(JSON.parse(stored));
     const storedUser = localStorage.getItem("infy_user");
     if (storedUser) {
       const u = JSON.parse(storedUser);
@@ -31,17 +32,29 @@ export default function Profile() {
     }
   }, [router]);
 
-  const saveKids = (updated) => {
-    setKids(updated);
-    localStorage.setItem("infy_kids", JSON.stringify(updated));
-  };
-
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newKid.name || !newKid.dob) return;
-    saveKids([...kids, { ...newKid, id: Date.now().toString(), vaccineRecords: [], weighingRecords: [] }]);
-    setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
-    setIsAdding(false);
+    setSaving(true);
+    try {
+      await addChild(
+        {
+          name: newKid.name,
+          dob: newKid.dob,
+          gender: newKid.gender,
+          weight: newKid.weight,
+          height: newKid.height,
+          placeBirth: newKid.placeBirth,
+          avatar: newKid.avatar,
+        },
+        avatarFile
+      );
+      setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
+      setAvatarFile(null);
+      setIsAdding(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSaveProfile = () => {
@@ -57,7 +70,7 @@ export default function Profile() {
 
   const KidForm = ({ onSubmit, title }) => (
     <form onSubmit={onSubmit} className="bg-white rounded-3xl p-5 shadow-xl border border-gray-100 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-300 relative">
-      <button type="button" onClick={() => { setIsAdding(false); setEditingKidId(null); }}
+      <button type="button" onClick={() => { setIsAdding(false); setAvatarFile(null); }}
         className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
         <X size={16}/>
       </button>
@@ -70,7 +83,10 @@ export default function Profile() {
           </div>
           <input type="file" accept="image/*" className="hidden" onChange={e => {
             const f = e.target.files[0];
-            if (f) setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
+            if (f) {
+              setAvatarFile(f);
+              setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
+            }
           }} />
         </label>
       </div>
@@ -116,8 +132,8 @@ export default function Profile() {
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-[#027027] text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-        <Save size={18} /> Save
+      <button type="submit" disabled={saving} className="w-full bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+        <Save size={18} /> {saving ? "Saving..." : "Save"}
       </button>
     </form>
   );

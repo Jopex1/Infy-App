@@ -6,9 +6,10 @@ export async function POST(req) {
     const apiKey = process.env.GROQ_API_KEY?.replace(/['"]/g, '').trim();
 
     if (!apiKey) {
-      return NextResponse.json({
-        reply: "Hello! I am Infy AI Doctor. Please add your free GROQ_API_KEY to your environment variables in Netlify to activate my powers!"
-      });
+      return NextResponse.json(
+        { error: "AI service is not configured. Please add GROQ_API_KEY to your environment variables." },
+        { status: 503 }
+      );
     }
 
     // Format conversation history for Groq (OpenAI compatible)
@@ -18,13 +19,13 @@ export async function POST(req) {
         content: `You are Infy AI Doctor, an expert pediatric consultant in the Infy Baby Tracker app. Provide warm, accurate advice on newborn care, baby growth, nutrition, sleep, and vaccinations.
         
 FORMATTING RULES:
-1. Provide your entire response in clean HTML format. Do not use markdown like asterisks (*).
+1. Provide your entire response in clean HTML format. NEVER use markdown — no asterisks, no ** bold syntax, no # headings.
 2. For main headings or key takeaways, use <strong style="color: #027027; display: block; margin-top: 8px;"> to give them a nice green color.
 3. For bullet points, use <ul> and <li style="margin-left: 16px; margin-top: 4px; margin-bottom: 4px;"> tags.
 4. If providing links to external articles, use <a href="..." style="color: #027027; text-decoration: underline;">.
-5. If highly relevant, you may include a sample image using <img src="..." style="width:100%; border-radius: 8px; margin-top: 8px; margin-bottom: 8px;" />.
-6. Always end your response by politely asking the user if they want further explanation, abstraction, or links to related articles.
-7. Keep responses concise (under 120 words) and friendly. Always remind parents to consult a pediatrician for emergencies.`
+5. Always end your response by politely asking the user if they want further explanation or links to related articles.
+6. Keep responses concise (under 150 words) and friendly. Always remind parents to consult a pediatrician for emergencies.
+7. Think carefully about the user's question before answering. Give specific, helpful pediatric advice — never give a generic greeting.`
       },
       ...messages.map((msg) => ({
         role: msg.sender === "user" ? "user" : "assistant",
@@ -42,7 +43,7 @@ FORMATTING RULES:
         model: "llama-3.1-8b-instant",
         messages: formattedMessages,
         temperature: 0.7,
-        max_tokens: 200
+        max_tokens: 400
       })
     });
 
