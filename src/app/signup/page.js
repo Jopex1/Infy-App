@@ -50,6 +50,22 @@ export default function SignUp() {
         location: form.location,
         avatar 
       }));
+
+      // Signup notification — only once per account
+      const signupKey = `infy_signup_notif_${user.uid}`;
+      if (!localStorage.getItem(signupKey)) {
+        const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+        const notif = {
+          id: `signup_${user.uid}`,
+          title: `Welcome to Infy, ${form.firstName}!`,
+          body: "Your account has been created. Start tracking your child's growth today.",
+          time: new Date().toISOString(),
+          unread: true,
+          type: "signup"
+        };
+        localStorage.setItem("infy_notifications", JSON.stringify([notif, ...existing]));
+        localStorage.setItem(signupKey, "1");
+      }
       
       setSubmitted(true);
     } catch (error) {
@@ -71,6 +87,22 @@ export default function SignUp() {
         location: '',
         avatar: user.photoURL 
       }));
+
+      // Signup notification — only once per account
+      const signupKey = `infy_signup_notif_${user.uid}`;
+      if (!localStorage.getItem(signupKey)) {
+        const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+        const notif = {
+          id: `signup_${user.uid}`,
+          title: `Welcome to Infy, ${user.displayName?.split(' ')[0] || 'there'}!`,
+          body: "Your account has been created. Start tracking your child's growth today.",
+          time: new Date().toISOString(),
+          unread: true,
+          type: "signup"
+        };
+        localStorage.setItem("infy_notifications", JSON.stringify([notif, ...existing]));
+        localStorage.setItem(signupKey, "1");
+      }
       
       router.push("/");
     } catch (error) {

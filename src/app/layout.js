@@ -10,6 +10,11 @@ export const metadata = {
     apple: "/images/infy-app-icon.png",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Infy",
+  },
 };
 
 export const viewport = {

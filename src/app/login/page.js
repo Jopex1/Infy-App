@@ -22,6 +22,18 @@ export default function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, form.identifier, form.password);
       const user = userCredential.user;
       
+      // Login notification — only fires after a real login (not existing session)
+      const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+      const loginNotif = {
+        id: `login_${Date.now()}`,
+        title: "Sign In Successful",
+        body: `You signed in with ${user.email}. Welcome back!`,
+        time: new Date().toISOString(),
+        unread: true,
+        type: "login"
+      };
+      localStorage.setItem("infy_notifications", JSON.stringify([loginNotif, ...existing]));
+
       localStorage.setItem("infy_user", JSON.stringify({ 
         uid: user.uid,
         email: user.email
@@ -37,6 +49,18 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+
+      // Login notification — fires after real login
+      const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+      const loginNotif = {
+        id: `login_${Date.now()}`,
+        title: "Sign In Successful",
+        body: `You signed in with Google as ${user.email}. Welcome back!`,
+        time: new Date().toISOString(),
+        unread: true,
+        type: "login"
+      };
+      localStorage.setItem("infy_notifications", JSON.stringify([loginNotif, ...existing]));
       
       localStorage.setItem("infy_user", JSON.stringify({ 
         uid: user.uid,

@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { ChevronLeft, Play, MoreVertical, Share2, MessageCircle, ExternalLink } from "lucide-react";
+import { ChevronLeft, Play, MoreVertical, Share2, MessageCircle, ExternalLink, Bookmark, ChevronRight, MoreHorizontal, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const categories = [
   {
     title: "Nutrition",
     icon: "🥗",
+    image: "/images/thumbnails/nutrition.jpg.jpeg",
     color: "bg-orange-50 border-orange-200",
     iconBg: "bg-orange-100",
     videos: [
@@ -17,8 +18,9 @@ const categories = [
   {
     title: "Vaccination",
     icon: "💉",
-    color: "bg-blue-50 border-blue-200",
-    iconBg: "bg-blue-100",
+    color: "bg-[#e8ece5] border-[#c0d1b6]",
+    iconBg: "transparent",
+    largeIcon: true,
     videos: [
       { id: "LRdoBofFcNs" },
       { id: "kQWiSM-98MA" },
@@ -27,6 +29,7 @@ const categories = [
   {
     title: "Child Development",
     icon: "🧠",
+    image: "/images/thumbnails/child development.jpg.jpeg",
     color: "bg-purple-50 border-purple-200",
     iconBg: "bg-purple-100",
     videos: [
@@ -37,6 +40,7 @@ const categories = [
   {
     title: "Newborn Care",
     icon: "👶",
+    image: "/images/thumbnails/Newborn Care.jpeg",
     color: "bg-pink-50 border-pink-200",
     iconBg: "bg-pink-100",
     videos: [
@@ -47,6 +51,7 @@ const categories = [
   {
     title: "Health & Wellness",
     icon: "❤️",
+    image: "/images/thumbnails/health and wellness.jpg.jpeg",
     color: "bg-red-50 border-red-200",
     iconBg: "bg-red-100",
     videos: [
@@ -57,6 +62,7 @@ const categories = [
   {
     title: "Safety & First Aid",
     icon: "🩺",
+    image: "/images/thumbnails/Safety and First AId.jpeg",
     color: "bg-teal-50 border-teal-200",
     iconBg: "bg-teal-100",
     videos: [
@@ -67,6 +73,7 @@ const categories = [
   {
     title: "Parenting",
     icon: "🏠",
+    image: "/images/thumbnails/Parenting.jpeg",
     color: "bg-yellow-50 border-yellow-200",
     iconBg: "bg-yellow-100",
     videos: [
@@ -77,6 +84,7 @@ const categories = [
   {
     title: "Growth Milestones",
     icon: "📏",
+    image: "/images/thumbnails/Growth Milestone.jpg.jpeg",
     color: "bg-green-50 border-green-200",
     iconBg: "bg-green-100",
     videos: [
@@ -87,6 +95,7 @@ const categories = [
   {
     title: "Sleep & Rest",
     icon: "🌙",
+    image: "/images/thumbnails/Sleep and Rest .jpeg",
     color: "bg-indigo-50 border-indigo-200",
     iconBg: "bg-indigo-100",
     videos: [
@@ -97,6 +106,7 @@ const categories = [
   {
     title: "Hygiene & Care",
     icon: "🛁",
+    image: "/images/thumbnails/Hygein and Care.jpg.jpeg",
     color: "bg-sky-50 border-sky-200",
     iconBg: "bg-sky-100",
     videos: [
@@ -107,6 +117,7 @@ const categories = [
   {
     title: "Learning & Play",
     icon: "🎨",
+    image: "/images/thumbnails/Learning And Play.jpeg",
     color: "bg-lime-50 border-lime-100",
     iconBg: "bg-lime-100",
     videos: [
@@ -130,7 +141,21 @@ export default function ExplorePage() {
   const [selected, setSelected] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const [videoTitles, setVideoTitles] = useState({});
+  const [watchlist, setWatchlist] = useState([]);
   const router = useRouter();
+
+  useEffect(() => {
+    setWatchlist(JSON.parse(localStorage.getItem("infy_watchlist") || "[]"));
+  }, []);
+
+  useEffect(() => {
+    if (menuOpen !== null) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [menuOpen]);
 
   const allVideoIds = useMemo(
     () => [...new Set(categories.flatMap((cat) => cat.videos.map((v) => v.id)))],
@@ -197,12 +222,18 @@ export default function ExplorePage() {
             <button
               key={i}
               onClick={() => setSelected(cat)}
-              className={`${cat.color} border rounded-3xl p-5 flex flex-col items-center text-center gap-3 active:scale-95 transition shadow-sm`}
+              className={`${cat.color} border rounded-3xl overflow-hidden flex flex-col items-center justify-center text-center active:scale-95 transition shadow-sm h-36 relative`}
             >
-              <div className={`${cat.iconBg} w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner`}>
-                {cat.icon}
-              </div>
-              <span className="text-sm font-bold text-gray-700 leading-tight">{cat.title}</span>
+              {cat.image ? (
+                <img src={cat.image} alt={cat.title} className="w-full h-full object-cover" />
+              ) : (
+                <>
+                  <div className={`${cat.iconBg} ${cat.largeIcon ? 'text-6xl mb-4' : 'w-14 h-14 rounded-2xl shadow-inner mb-2 text-3xl'} flex items-center justify-center`}>
+                    {cat.icon}
+                  </div>
+                  <span className="text-sm font-bold text-gray-700 leading-tight px-2">{cat.title}</span>
+                </>
+              )}
             </button>
           ))}
         </div>
@@ -222,9 +253,16 @@ export default function ExplorePage() {
           </div>
 
           <div className="p-4 space-y-4">
+            {menuOpen !== null && (
+              <div 
+                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]" 
+                onClick={() => setMenuOpen(null)}
+                onTouchStart={() => setMenuOpen(null)}
+              />
+            )}
             {selected.videos.map((v, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border-2 border-green-200 flex flex-col relative">
-                <div className="aspect-video w-full relative bg-gray-900">
+              <div key={i} className="bg-white dark:bg-[#027027] rounded-[20px] shadow-sm border border-green-200 dark:border-green-800 flex flex-col relative">
+                <div className="aspect-video w-full relative bg-gray-900 rounded-t-[20px] overflow-hidden">
                   <img
                     src={`https://img.youtube.com/vi/${v.id}/mqdefault.jpg`}
                     alt={getTitle(v)}
@@ -237,48 +275,104 @@ export default function ExplorePage() {
                   </div>
                 </div>
 
-                <div className="p-4">
+                <div className="p-4 relative">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-gray-800 leading-tight flex-1 pr-2">{getTitle(v)}</h3>
-                    <button
-                      onClick={() => setMenuOpen(menuOpen === i ? null : i)}
-                      className="text-gray-400 hover:text-gray-600 transition p-1"
-                    >
-                      <MoreVertical size={20} />
-                    </button>
+                    <h3 className="font-bold text-gray-800 dark:text-white leading-tight flex-1 pr-2">{getTitle(v)}</h3>
+                    <div className="relative z-50">
+                      <button
+                        onClick={() => setMenuOpen(menuOpen === i ? null : i)}
+                        className="text-gray-400 dark:text-green-100 hover:text-gray-600 dark:hover:text-white transition p-1"
+                      >
+                        <MoreVertical size={20} />
+                      </button>
+
+                      {menuOpen === i && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setMenuOpen(null)}>
+                          <div className="bg-white rounded-[20px] shadow-xl border border-green-200 p-5 w-full max-w-sm animate-in zoom-in-95 duration-200 overflow-hidden" onClick={e => e.stopPropagation()}>
+                            
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="font-bold text-gray-900 text-lg">Video Options</h3>
+                              <button onClick={() => setMenuOpen(null)} className="p-1 text-gray-400 hover:text-gray-600 rounded-full transition">
+                                <X size={20} />
+                              </button>
+                            </div>
+
+                            <button
+                              onClick={() => handleWatchOnYouTube(v)}
+                              className="w-full bg-white border border-green-200 rounded-[16px] p-3 shadow-sm flex items-center gap-4 hover:shadow-md transition relative z-10 mb-3 group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                              </div>
+                              <div className="flex-1 text-left">
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight mb-0.5">Watch on YouTube</h4>
+                                <p className="text-xs text-gray-500 leading-tight">Open this video on YouTube</p>
+                              </div>
+                              <ChevronRight size={16} className="text-gray-400" />
+                            </button>
+                            
+                            <button
+                              onClick={() => handleShare(v)}
+                              className="w-full bg-white border border-green-200 rounded-[16px] p-3 shadow-sm flex items-center gap-4 hover:shadow-md transition relative z-10 mb-3 group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 flex-shrink-0">
+                                <Share2 size={20} strokeWidth={2.5} />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight mb-0.5">Share</h4>
+                                <p className="text-xs text-gray-500 leading-tight">Share this video with others</p>
+                              </div>
+                              <ChevronRight size={16} className="text-gray-400" />
+                            </button>
+
+                            <button
+                              onClick={() => handleAskInfyAI(v)}
+                              className="w-full bg-white border border-green-200 rounded-[16px] p-3 shadow-sm flex items-center gap-4 hover:shadow-md transition relative z-10 mb-4 group"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-[#027027] flex-shrink-0">
+                                <MessageCircle size={20} strokeWidth={2.5} />
+                              </div>
+                              <div className="flex-1 text-left">
+                                <h4 className="font-semibold text-gray-900 text-sm leading-tight mb-0.5">Ask Infy AI</h4>
+                                <p className="text-xs text-gray-500 leading-tight">Get AI-powered answers</p>
+                              </div>
+                              <ChevronRight size={16} className="text-gray-400" />
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                let current = [...watchlist];
+                                const index = current.findIndex(w => w.id === v.id);
+                                if (index > -1) {
+                                  current.splice(index, 1);
+                                  alert("Removed from Watchlist!");
+                                } else {
+                                  current.push({ id: v.id, title: getTitle(v) });
+                                  alert("Added to Action Forms in notifications!"); 
+                                }
+                                setWatchlist(current);
+                                localStorage.setItem("infy_watchlist", JSON.stringify(current));
+                                setMenuOpen(null); 
+                              }}
+                              className="relative z-10 flex justify-center items-center gap-2 w-full bg-[#027027] hover:bg-[#014d1a] transition py-3.5 rounded-xl text-white font-bold text-sm shadow-md active:scale-95"
+                            >
+                              <Bookmark size={18} fill={watchlist.some(w => w.id === v.id) ? "currentColor" : "none"} />
+                              <span>{watchlist.some(w => w.id === v.id) ? "Remove from Watchlist" : "Add to Watchlist"}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <p className="text-xs text-gray-400">YouTube</p>
+                  <p className="text-xs text-gray-400 dark:text-green-200">YouTube</p>
                 </div>
 
-                {menuOpen === i && (
-                  <div className="absolute top-20 right-4 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-20 w-48 animate-in fade-in zoom-in-95 duration-200">
-                    <button
-                      onClick={() => handleWatchOnYouTube(v)}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition"
-                    >
-                      <ExternalLink size={16} className="text-red-500" />
-                      Watch on YouTube
-                    </button>
-                    <button
-                      onClick={() => handleShare(v)}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition"
-                    >
-                      <Share2 size={16} className="text-blue-500" />
-                      Share
-                    </button>
-                    <button
-                      onClick={() => handleAskInfyAI(v)}
-                      className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition"
-                    >
-                      <MessageCircle size={16} className="text-green-500" />
-                      Ask Infy AI
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
           </div>
+
+
         </div>
       )}
     </div>

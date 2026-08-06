@@ -3,10 +3,17 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { auth, signInWithPopup, googleProvider } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
+  const [userAuth, setUserAuth] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => setUserAuth(u));
+    return () => unsubscribe();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -37,16 +44,23 @@ export default function Onboarding() {
   useEffect(() => {
     if (step === 1) {
       const timer = setTimeout(() => {
-        setStep(2);
+        if (userAuth) {
+          router.push("/home");
+        } else {
+          setStep(2);
+        }
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [step]);
+  }, [step, userAuth, router]);
 
   if (step === 1) {
     return (
       <div 
-        onClick={() => setStep(2)}
+        onClick={() => {
+          if (userAuth) router.push("/home");
+          else setStep(2);
+        }}
         className="fixed inset-0 bg-white z-50 cursor-pointer"
       >
         <img 

@@ -68,75 +68,7 @@ export default function Profile() {
     router.push(`/profile/edit/${kid.id}`);
   };
 
-  const KidForm = ({ onSubmit, title }) => (
-    <form onSubmit={onSubmit} className="bg-white rounded-3xl p-5 shadow-xl border border-gray-100 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-300 relative">
-      <button type="button" onClick={() => { setIsAdding(false); setAvatarFile(null); }}
-        className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
-        <X size={16}/>
-      </button>
-      <h3 className="text-base font-bold text-[#027027] mb-1">{title}</h3>
-      
-      <div className="flex justify-center mb-2">
-        <label className="relative cursor-pointer">
-          <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-            {newKid.avatar ? <img src={newKid.avatar} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={20} className="text-[#027027]" />}
-          </div>
-          <input type="file" accept="image/*" className="hidden" onChange={e => {
-            const f = e.target.files[0];
-            if (f) {
-              setAvatarFile(f);
-              setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
-            }
-          }} />
-        </label>
-      </div>
 
-      <div>
-        <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
-        <input required type="text" value={newKid.name} onChange={e => setNewKid({...newKid, name: e.target.value})}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Child's name" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Date of Birth</label>
-          <input required type="date" value={newKid.dob} onChange={e => setNewKid({...newKid, dob: e.target.value})}
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Gender</label>
-          <select value={newKid.gender} onChange={e => setNewKid({...newKid, gender: e.target.value})}
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
-            <option>Girl</option>
-            <option>Boy</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Place of Birth</label>
-        <input type="text" value={newKid.placeBirth} onChange={e => setNewKid({...newKid, placeBirth: e.target.value})}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Hospital / City" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Weight (kg)</label>
-          <input type="number" step="0.1" value={newKid.weight} onChange={e => setNewKid({...newKid, weight: e.target.value})}
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 3.5" />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Height (cm)</label>
-          <input type="number" step="0.1" value={newKid.height} onChange={e => setNewKid({...newKid, height: e.target.value})}
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 50" />
-        </div>
-      </div>
-
-      <button type="submit" disabled={saving} className="w-full bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-        <Save size={18} /> {saving ? "Saving..." : "Save"}
-      </button>
-    </form>
-  );
 
   return (
     <div className="px-6 space-y-5 pb-safe animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
@@ -222,7 +154,75 @@ export default function Profile() {
       </div>
 
       {/* Add Kid Form */}
-      {isAdding && <KidForm onSubmit={handleAdd} title="Register a Child" />}
+      {isAdding && (
+        <form onSubmit={handleAdd} className="bg-white rounded-3xl p-5 shadow-xl border border-gray-100 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-300 relative">
+          <button type="button" onClick={() => { setIsAdding(false); setAvatarFile(null); }}
+            className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
+            <X size={16}/>
+          </button>
+          <h3 className="text-base font-bold text-[#027027] mb-1">Register a Child</h3>
+          
+          <div className="flex justify-center mb-2">
+            <label className="relative cursor-pointer">
+              <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
+                {newKid.avatar ? <img src={newKid.avatar} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={20} className="text-[#027027]" />}
+              </div>
+              <input type="file" accept="image/*" className="hidden" onChange={e => {
+                const f = e.target.files[0];
+                if (f) {
+                  setAvatarFile(f);
+                  setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
+                }
+              }} />
+            </label>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
+            <input required type="text" value={newKid.name} onChange={e => setNewKid({...newKid, name: e.target.value})}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Child's name" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Date of Birth</label>
+              <input required type="date" value={newKid.dob} onChange={e => setNewKid({...newKid, dob: e.target.value})}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Gender</label>
+              <select value={newKid.gender} onChange={e => setNewKid({...newKid, gender: e.target.value})}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
+                <option>Girl</option>
+                <option>Boy</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Place of Birth</label>
+            <input type="text" value={newKid.placeBirth} onChange={e => setNewKid({...newKid, placeBirth: e.target.value})}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Hospital / City" />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Weight (kg)</label>
+              <input type="number" step="0.1" value={newKid.weight} onChange={e => setNewKid({...newKid, weight: e.target.value})}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 3.5" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Height (cm)</label>
+              <input type="number" step="0.1" value={newKid.height} onChange={e => setNewKid({...newKid, height: e.target.value})}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 50" />
+            </div>
+          </div>
+
+          <button type="submit" disabled={saving} className="w-full bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+            <Save size={18} /> {saving ? "Saving..." : "Save"}
+          </button>
+        </form>
+      )}
 
       {/* User Info Box */}
       <div className="border border-[#027027]/30 rounded-3xl p-5 bg-white space-y-4 shadow-sm">
