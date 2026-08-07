@@ -17,10 +17,10 @@ export default function Onboarding() {
     return () => unsubscribe();
   }, []);
 
-  // Step 0: animated logo → step 1 after 1.8s
+  // Step 0: animated logo + text → step 1 after 3.8s
   useEffect(() => {
     if (step === 0) {
-      const t = setTimeout(() => setStep(1), 1800);
+      const t = setTimeout(() => setStep(1), 3800);
       return () => clearTimeout(t);
     }
   }, [step]);
@@ -60,20 +60,47 @@ export default function Onboarding() {
   // ── Step 0: Animated logo splash ────────────────────────────────────────────
   if (step === 0) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div style={{ animation: "logoEntrance 1.4s ease forwards" }}>
-          <img
-            src="/images/infy-app-icon.png"
-            alt="Infy"
-            style={{ width: 120, height: 120, objectFit: "contain" }}
-          />
+      <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+
+        {/* Logo + text container */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+
+          {/* Logo: bounce in then float up */}
+          <div style={{ animation: "logoUp 2s cubic-bezier(0.34,1.56,0.64,1) forwards" }}>
+            <img
+              src="/images/infy-app-icon.png"
+              alt="Infy"
+              style={{ width: 110, height: 110, objectFit: "contain" }}
+            />
+          </div>
+
+          {/* Text block */}
+          <div style={{ textAlign: "center", overflow: "hidden" }}>
+            {/* App name */}
+            <div style={{ animation: "slideReveal 0.7s cubic-bezier(0.25,0.46,0.45,0.94) 1.6s both" }}>
+              <span style={{ fontSize: 28, fontWeight: 800, color: "#027027", letterSpacing: -0.5 }}>
+                Infy
+              </span>
+            </div>
+            {/* Slogan */}
+            <div style={{ animation: "slideReveal 0.7s cubic-bezier(0.25,0.46,0.45,0.94) 2.1s both" }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#f7e03c", letterSpacing: 0.3 }}>
+                Every Little Moment Matters.
+              </span>
+            </div>
+          </div>
         </div>
+
         <style>{`
-          @keyframes logoEntrance {
-            0%   { opacity: 0; transform: scale(0.5); }
-            50%  { opacity: 1; transform: scale(1.08); }
-            75%  { transform: scale(0.96); }
-            100% { opacity: 1; transform: scale(1); }
+          @keyframes logoUp {
+            0%   { opacity: 0; transform: scale(0.4) translateY(0px); }
+            50%  { opacity: 1; transform: scale(1.1) translateY(0px); }
+            75%  { transform: scale(0.97) translateY(0px); }
+            100% { opacity: 1; transform: scale(1) translateY(-12px); }
+          }
+          @keyframes slideReveal {
+            0%   { opacity: 0; transform: translateX(-32px); }
+            100% { opacity: 1; transform: translateX(0); }
           }
         `}</style>
       </div>
