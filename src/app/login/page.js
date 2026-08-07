@@ -39,7 +39,7 @@ export default function Login() {
         email: user.email
       }));
       
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       setError(error.message);
     }
@@ -72,7 +72,7 @@ export default function Login() {
         avatar: user.photoURL 
       }));
       
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       setError(error.message);
     }

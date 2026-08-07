@@ -104,7 +104,7 @@ export default function SignUp() {
         localStorage.setItem(signupKey, "1");
       }
       
-      router.push("/");
+      router.push("/home");
     } catch (error) {
       setError(error.message);
     }
