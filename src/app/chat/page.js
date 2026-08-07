@@ -417,7 +417,7 @@ export default function ChatPage() {
             e.preventDefault();
             const subject = encodeURIComponent(e.target.subject.value);
             const message = encodeURIComponent(e.target.message.value);
-            window.location.href = `mailto:infysupport@gmail.com?subject=${subject}&body=${message}`;
+            window.location.href = `mailto:infysupport5@gmail.com?subject=${subject}&body=${message}`;
           }} className="space-y-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Subject</label>

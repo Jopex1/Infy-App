@@ -92,8 +92,8 @@ export default function Topbar() {
       title: "Help & Support",
       icon: <HelpCircle size={20}/>,
       items: [
-        { label: "Contact Support", action: () => { setMenuOpen(false); window.location.href = "mailto:infysupport@gmail.com?subject=Support%20Request"; } },
-        { label: "Send Feedback", action: () => { setMenuOpen(false); window.location.href = "mailto:infysupport@gmail.com?subject=App%20Feedback"; } },
+        { label: "Contact Support", action: () => { setMenuOpen(false); window.location.href = "mailto:infysupport5@gmail.com?subject=Support%20Request"; } },
+        { label: "Send Feedback", action: () => { setMenuOpen(false); window.location.href = "mailto:infysupport5@gmail.com?subject=App%20Feedback"; } },
       ]
     },
     {
