@@ -53,7 +53,10 @@ function getDaysToNext(records, dob) {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const completedMonths = (records && Array.isArray(records)) ? records.length : 0;
-  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + completedMonths + 1, birthDate.getDate());
+  
+  const targetMonth = completedMonths === 0 ? 0 : completedMonths;
+  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + targetMonth, birthDate.getDate());
+  
   const diffMs = nextTarget.getTime() - today.getTime();
   const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return daysLeft < 0 ? 0 : daysLeft;
@@ -63,7 +66,10 @@ function getNextDate(records, dob) {
   if (!dob) return "";
   const birthDate = new Date(dob);
   const completedMonths = (records && Array.isArray(records)) ? records.length : 0;
-  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + completedMonths + 1, birthDate.getDate());
+  
+  const targetMonth = completedMonths === 0 ? 0 : completedMonths;
+  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + targetMonth, birthDate.getDate());
+  
   return nextTarget.toISOString().slice(0, 10);
 }
 
