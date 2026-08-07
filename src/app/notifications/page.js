@@ -168,8 +168,8 @@ export default function Notifications() {
   return (
     <div className="flex flex-col min-h-[calc(100dvh-72px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Tab Switcher - sticky */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-gray-100">
-        <div className="bg-white p-2 rounded-full flex items-center justify-between border-2 border-[#027027]/20 shadow-sm">
+      <div className="sticky top-0 z-20 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-gray-100 dark:border-[#222]">
+        <div className="bg-white dark:bg-[#222] p-2 rounded-full flex items-center justify-between border-2 border-[#027027]/20 shadow-sm">
             <div className="flex flex-1 items-center gap-1">
               <button 
                 onClick={() => setActiveTab("updates")}

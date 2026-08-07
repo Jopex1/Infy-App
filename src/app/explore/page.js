@@ -348,11 +348,22 @@ export default function ExplorePage() {
                                   alert("Removed from Watchlist!");
                                 } else {
                                   current.push({ id: v.id, title: getTitle(v) });
+                                  const notifs = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+                                  notifs.unshift({
+                                    id: `wl_${Date.now()}`,
+                                    title: "Video Added to Watchlist",
+                                    desc: `You added "${getTitle(v)}" to your Action Forms.`,
+                                    time: "Just now",
+                                    unread: true,
+                                    type: "watchlist"
+                                  });
+                                  localStorage.setItem("infy_notifications", JSON.stringify(notifs));
+                                  window.dispatchEvent(new Event("storage"));
                                   alert("Added to Action Forms in notifications!"); 
                                 }
                                 setWatchlist(current);
                                 localStorage.setItem("infy_watchlist", JSON.stringify(current));
-                                setMenuOpen(null); 
+                                setMenuOpen(null);
                               }}
                               className="relative z-10 flex justify-center items-center gap-2 w-full bg-[#027027] hover:bg-[#014d1a] transition py-3.5 rounded-xl text-white font-bold text-sm shadow-md active:scale-95"
                             >

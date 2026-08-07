@@ -226,10 +226,14 @@ export default function Topbar() {
 
             <div className="flex gap-3">
               <button onClick={() => setDeleteDialog(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold rounded-xl active:scale-95 transition text-sm">Cancel</button>
-              <button onClick={() => {
+              <button onClick={async () => {
                 setDeleteDialog(false);
                 localStorage.removeItem("infy_user");
                 localStorage.removeItem("infy_kids");
+                try {
+                  const { auth, signOut } = await import('@/lib/firebase');
+                  await signOut(auth);
+                } catch (e) {}
                 router.push("/onboarding");
               }} className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl active:scale-95 transition text-sm shadow-sm">Delete</button>
             </div>
@@ -244,9 +248,13 @@ export default function Topbar() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Are you sure you want to log out of your account?</p>
             <div className="flex gap-3">
               <button onClick={() => setLogoutDialog(false)} className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold rounded-xl active:scale-95 transition text-sm">Cancel</button>
-              <button onClick={() => {
+              <button onClick={async () => {
                 setLogoutDialog(false);
                 localStorage.removeItem("infy_user");
+                try {
+                  const { auth, signOut } = await import('@/lib/firebase');
+                  await signOut(auth);
+                } catch (e) {}
                 router.push("/onboarding");
               }} className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-xl active:scale-95 transition text-sm shadow-sm">Log Out</button>
             </div>
