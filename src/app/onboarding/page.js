@@ -17,10 +17,10 @@ export default function Onboarding() {
     return () => unsubscribe();
   }, []);
 
-  // Step 0: animated logo + text → step 1 after 3.8s
+  // Step 0: animated logo + text → step 1 after 4.8s
   useEffect(() => {
     if (step === 0) {
-      const t = setTimeout(() => setStep(1), 3800);
+      const t = setTimeout(() => setStep(1), 4800);
       return () => clearTimeout(t);
     }
   }, [step]);
@@ -84,7 +84,7 @@ export default function Onboarding() {
             </div>
             {/* Slogan */}
             <div style={{ animation: "slideReveal 0.7s cubic-bezier(0.25,0.46,0.45,0.94) 2.1s both" }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#f7e03c", letterSpacing: 0.3 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#111111", letterSpacing: 0.3 }}>
                 Every Little Moment Matters.
               </span>
             </div>
@@ -96,7 +96,7 @@ export default function Onboarding() {
             0%   { opacity: 0; transform: scale(0.4) translateY(0px); }
             50%  { opacity: 1; transform: scale(1.1) translateY(0px); }
             75%  { transform: scale(0.97) translateY(0px); }
-            100% { opacity: 1; transform: scale(1) translateY(-12px); }
+            100% { opacity: 1; transform: scale(1) translateY(-24px); }
           }
           @keyframes slideReveal {
             0%   { opacity: 0; transform: translateX(-32px); }
