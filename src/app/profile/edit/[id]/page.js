@@ -11,6 +11,7 @@ export default function EditChildPage() {
   const fileRef = useRef(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const { kids, updateChild, deleteChild, loading } = useChildren();
   const [kid, setKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: null });
@@ -27,16 +28,20 @@ export default function EditChildPage() {
     setSaving(true);
     try {
       await updateChild(id, kid, avatarFile);
-      router.push("/profile");
-    } finally {
       setSaving(false);
+      router.push("/profile");
+    } catch (err) {
+      setSaving(false);
+      alert("Failed to save. Please try again.");
     }
   };
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this child's profile?")) {
-      await deleteChild(id);
+      setDeleting(true);
+      // Navigate immediately — don't wait for snapshot to avoid UI getting stuck
       router.push("/profile");
+      deleteChild(id).catch(() => {});
     }
   };
 
@@ -117,7 +122,7 @@ export default function EditChildPage() {
             <button type="submit" disabled={saving} className="flex-1 bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition text-sm">
               <Save size={18} /> {saving ? "Saving..." : "Save Changes"}
             </button>
-            <button type="button" onClick={handleDelete} className="bg-red-50 text-red-600 font-bold px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm border border-red-100 hover:bg-red-100 active:scale-95 transition">
+            <button type="button" onClick={handleDelete} disabled={deleting} className="bg-red-50 text-red-600 font-bold px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm border border-red-100 hover:bg-red-100 active:scale-95 transition disabled:opacity-50">
               <Trash2 size={20} />
             </button>
           </div>

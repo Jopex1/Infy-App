@@ -49,11 +49,14 @@ export default function Profile() {
         },
         avatarFile
       );
+      // Close form immediately on success
+      setIsAdding(false);
       setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
       setAvatarFile(null);
-      setIsAdding(false);
-    } finally {
       setSaving(false);
+    } catch (err) {
+      setSaving(false);
+      alert("Failed to save. Please try again.");
     }
   };
 
