@@ -166,9 +166,9 @@ export default function Notifications() {
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100dvh-72px)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
       {/* Tab Switcher - sticky */}
-      <div className="sticky top-0 z-20 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-gray-100 dark:border-[#222]">
+      <div className="fixed left-0 right-0 max-w-md mx-auto z-20 bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-md px-4 pt-3 pb-3 border-b border-gray-100 dark:border-[#222]" style={{ top: 'calc(4.5rem + env(safe-area-inset-top, 0px))' }}>
         <div className="bg-white dark:bg-[#222] p-2 rounded-full flex items-center justify-between border-2 border-[#027027]/20 shadow-sm">
             <div className="flex flex-1 items-center gap-1">
               <button 
@@ -202,7 +202,7 @@ export default function Notifications() {
         </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-y-contain p-4 pb-safe">
+      <div className="p-4 pt-[90px] pb-safe">
         <div className="space-y-3">
         {activeTab === "updates" ? (
           notifications.length > 0 ? notifications.map((n, i) => (

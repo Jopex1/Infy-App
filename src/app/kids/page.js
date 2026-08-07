@@ -78,6 +78,7 @@ export default function KidsDashboard() {
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatarFile: null, avatarPreview: "" });
   const [activeForm, setActiveForm] = useState(null); // "vaccine" | "weighing" | "vitaminA" | "deworming"
   const [formData, setFormData] = useState({});
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileRef = useRef();
 
   const [loginMethod, setLoginMethod] = useState("google");
@@ -199,11 +200,13 @@ export default function KidsDashboard() {
         updateData.dewormingRecords = [...(activeKid.dewormingRecords || []), formData];
       }
       
-      await updateDoc(kidRef, updateData);
+      // Fire and forget updateDoc
+      updateDoc(kidRef, updateData).catch(console.error);
+      
+      setIsSaving(false);
       setActiveForm(null);
     } catch (error) {
       console.error("Error saving form:", error);
-    } finally {
       setIsSaving(false);
     }
   };
@@ -244,12 +247,18 @@ export default function KidsDashboard() {
         createdAt: new Date().toISOString()
       };
       
-      await addDoc(collection(db, "children"), childDoc);
-      setIsAdding(false);
-      setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatarFile: null, avatarPreview: "" });
+      // Fire and forget addDoc so UI doesn't hang waiting for server sync
+      addDoc(collection(db, "children"), childDoc).catch(console.error);
+      
+      setIsSaving(false);
+      setSaveSuccess(newKid.name);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatarFile: null, avatarPreview: "" });
+        setIsAdding(false);
+      }, 2000);
     } catch (error) {
       console.error("Error adding child:", error);
-    } finally {
       setIsSaving(false);
     }
   };
@@ -713,8 +722,8 @@ export default function KidsDashboard() {
       </div>
 
       {isAdding && activeKid && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-y-auto max-h-[90vh] pb-safe">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh] relative" style={{ scrollbarWidth: 'none' }}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[#027027]">Add Child</h2>
               <button onClick={() => setIsAdding(false)} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
@@ -769,6 +778,15 @@ export default function KidsDashboard() {
                 {isSaving ? "Saving to Cloud..." : <><Save size={18} /> Save Child Profile</>}
               </button>
             </form>
+
+            {/* Success Overlay */}
+            {saveSuccess && (
+              <div className="absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2705/512.gif" alt="Success" className="w-32 h-32 mb-4" />
+                <h3 className="text-2xl font-black text-[#027027] mb-2">Child Added!</h3>
+                <p className="text-sm text-gray-500">{saveSuccess} successfully added.</p>
+              </div>
+            )}
           </div>
         </div>
       )}

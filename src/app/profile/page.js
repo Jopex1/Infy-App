@@ -12,6 +12,7 @@ export default function Profile() {
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
   const [avatarFile, setAvatarFile] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [user, setUser] = useState({ firstName: "", lastName: "", email: "", phone: "", location: "", avatar: null });
   const fileRef = useRef();
 
@@ -37,7 +38,8 @@ export default function Profile() {
     if (!newKid.name || !newKid.dob) return;
     setSaving(true);
     try {
-      await addChild(
+      // Fire and forget so UI feels snappy
+      addChild(
         {
           name: newKid.name,
           dob: newKid.dob,
@@ -48,12 +50,16 @@ export default function Profile() {
           avatar: newKid.avatar,
         },
         avatarFile
-      );
-      // Close form immediately on success
-      setIsAdding(false);
-      setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
-      setAvatarFile(null);
+      ).catch(console.error);
+
       setSaving(false);
+      setSaveSuccess(newKid.name);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setIsAdding(false);
+        setNewKid({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
+        setAvatarFile(null);
+      }, 2000);
     } catch (err) {
       setSaving(false);
       alert("Failed to save. Please try again.");
@@ -158,73 +164,85 @@ export default function Profile() {
 
       {/* Add Kid Form */}
       {isAdding && (
-        <form onSubmit={handleAdd} className="bg-white rounded-3xl p-5 shadow-xl border border-gray-100 flex flex-col gap-3 animate-in fade-in zoom-in-95 duration-300 relative">
-          <button type="button" onClick={() => { setIsAdding(false); setAvatarFile(null); }}
-            className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200">
-            <X size={16}/>
-          </button>
-          <h3 className="text-base font-bold text-[#027027] mb-1">Register a Child</h3>
-          
-          <div className="flex justify-center mb-2">
-            <label className="relative cursor-pointer">
-              <div className="w-16 h-16 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-                {newKid.avatar ? <img src={newKid.avatar} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={20} className="text-[#027027]" />}
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl animate-in zoom-in-95 duration-300 overflow-y-auto max-h-[90vh] relative" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#027027]">Register a Child</h3>
+              <button type="button" onClick={() => { setIsAdding(false); setAvatarFile(null); }} className="text-gray-400 bg-gray-100 rounded-full p-1.5 hover:bg-gray-200"><X size={18}/></button>
+            </div>
+            
+            <form onSubmit={handleAdd} className="flex flex-col gap-3">
+              <div className="flex justify-center mb-2">
+                <label className="relative cursor-pointer">
+                  <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
+                    {newKid.avatar ? <img src={newKid.avatar} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={24} className="text-[#027027]" />}
+                  </div>
+                  <input type="file" accept="image/*" className="hidden" onChange={e => {
+                    const f = e.target.files[0];
+                    if (f) {
+                      setAvatarFile(f);
+                      setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
+                    }
+                  }} />
+                </label>
               </div>
-              <input type="file" accept="image/*" className="hidden" onChange={e => {
-                const f = e.target.files[0];
-                if (f) {
-                  setAvatarFile(f);
-                  setNewKid({ ...newKid, avatar: URL.createObjectURL(f) });
-                }
-              }} />
-            </label>
-          </div>
 
-          <div>
-            <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
-            <input required type="text" value={newKid.name} onChange={e => setNewKid({...newKid, name: e.target.value})}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Child's name" />
-          </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
+                <input required type="text" value={newKid.name} onChange={e => setNewKid({...newKid, name: e.target.value})}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Child's name" />
+              </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Date of Birth</label>
-              <input required type="date" value={newKid.dob} onChange={e => setNewKid({...newKid, dob: e.target.value})}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Gender</label>
-              <select value={newKid.gender} onChange={e => setNewKid({...newKid, gender: e.target.value})}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
-                <option>Girl</option>
-                <option>Boy</option>
-              </select>
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Date of Birth</label>
+                  <input required type="date" value={newKid.dob} onChange={e => setNewKid({...newKid, dob: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Gender</label>
+                  <select value={newKid.gender} onChange={e => setNewKid({...newKid, gender: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
+                    <option>Girl</option>
+                    <option>Boy</option>
+                  </select>
+                </div>
+              </div>
 
-          <div>
-            <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Place of Birth</label>
-            <input type="text" value={newKid.placeBirth} onChange={e => setNewKid({...newKid, placeBirth: e.target.value})}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Hospital / City" />
-          </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Place of Birth</label>
+                <input type="text" value={newKid.placeBirth} onChange={e => setNewKid({...newKid, placeBirth: e.target.value})}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="Hospital / City" />
+              </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Weight (kg)</label>
-              <input type="number" step="0.1" value={newKid.weight} onChange={e => setNewKid({...newKid, weight: e.target.value})}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 3.5" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Height (cm)</label>
-              <input type="number" step="0.1" value={newKid.height} onChange={e => setNewKid({...newKid, height: e.target.value})}
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 50" />
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Weight (kg)</label>
+                  <input type="number" step="0.1" value={newKid.weight} onChange={e => setNewKid({...newKid, weight: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 3.5" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Height (cm)</label>
+                  <input type="number" step="0.1" value={newKid.height} onChange={e => setNewKid({...newKid, height: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-[#027027] text-sm" placeholder="e.g. 50" />
+                </div>
+              </div>
 
-          <button type="submit" disabled={saving} className="w-full bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-            <Save size={18} /> {saving ? "Saving..." : "Save"}
-          </button>
-        </form>
+              <button type="submit" disabled={saving} className="w-full mt-2 bg-[#027027] disabled:opacity-50 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                <Save size={18} /> {saving ? "Saving..." : "Save Child Profile"}
+              </button>
+            </form>
+
+            {/* Success Overlay */}
+            {saveSuccess && (
+              <div className="absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
+                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2705/512.gif" alt="Success" className="w-32 h-32 mb-4" />
+                <h3 className="text-2xl font-black text-[#027027] mb-2">Child Added!</h3>
+                <p className="text-sm text-gray-500">{saveSuccess} successfully added.</p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* User Info Box */}
