@@ -2,14 +2,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { auth, signInWithPopup, googleProvider } from "@/lib/firebase";
+import { auth, signInWithPopup, signOut, googleProvider } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 
 export default function Onboarding() {
-  const [step, setStep] = useState(0); // 0 = animated logo splash, 1 = onboarding 1, 2 = onboarding 2
+  const [step, setStep] = useState(0);
   const [userAuth, setUserAuth] = useState(null);
   const [bg2Loaded, setBg2Loaded] = useState(false);
+  const [pendingUser, setPendingUser] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,22 +43,29 @@ export default function Onboarding() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      localStorage.setItem("infy_user", JSON.stringify({
-        uid: user.uid,
-        email: user.email,
-        firstName: user.displayName?.split(" ")[0] || "",
-        lastName: user.displayName?.split(" ").slice(1).join(" ") || "",
-        phone: "",
-        location: "",
-        avatar: user.photoURL,
-      }));
-      router.push("/home");
+      setPendingUser(result.user);
     } catch (error) {
-      if (error.code !== "auth/cancelled-popup-request") {
+      if (error.code !== "auth/cancelled-popup-request" && error.code !== "auth/popup-closed-by-user") {
         console.error("Google sign in error:", error);
       }
     }
+  };
+
+  const confirmGoogleSignIn = () => {
+    const user = pendingUser;
+    localStorage.setItem("infy_user", JSON.stringify({
+      uid: user.uid, email: user.email,
+      firstName: user.displayName?.split(" ")[0] || "",
+      lastName: user.displayName?.split(" ").slice(1).join(" ") || "",
+      phone: "", location: "", avatar: user.photoURL,
+    }));
+    setPendingUser(null);
+    router.push("/home");
+  };
+
+  const cancelGoogleSignIn = async () => {
+    setPendingUser(null);
+    try { await signOut(auth); } catch (e) {}
   };
 
   // ── Step 0: Animated logo splash ────────────────────────────────────────────
@@ -131,6 +139,26 @@ export default function Onboarding() {
   // ── Step 2: Onboarding 2 — wait for bg image before showing content ──────────
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-hidden">
+
+      {/* Google confirmation dialog */}
+      {pendingUser && (
+        <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4">
+            {pendingUser.photoURL && (
+              <img src={pendingUser.photoURL} alt="Avatar" className="w-16 h-16 rounded-full border-2 border-[#027027]" />
+            )}
+            <div className="text-center">
+              <p className="font-bold text-gray-900 text-base">{pendingUser.displayName || "Your Account"}</p>
+              <p className="text-sm text-gray-500 mt-0.5">{pendingUser.email}</p>
+            </div>
+            <p className="text-sm text-gray-600 text-center">Continue signing in with this account?</p>
+            <div className="flex gap-3 w-full">
+              <button onClick={cancelGoogleSignIn} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl active:scale-95 transition text-sm">Cancel</button>
+              <button onClick={confirmGoogleSignIn} className="flex-1 py-3 bg-[#027027] text-white font-bold rounded-xl active:scale-95 transition text-sm shadow-md">Continue</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Preload bg image silently; reveal everything together on load */}
       <img

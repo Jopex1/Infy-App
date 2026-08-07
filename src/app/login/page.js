@@ -6,39 +6,28 @@ import Link from "next/link";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import { normalizePhoneNumber } from "@/lib/phoneHelper";
-import { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider } from "@/lib/firebase";
+import { auth, signInWithEmailAndPassword, signInWithPopup, signOut, googleProvider } from "@/lib/firebase";
 
 export default function Login() {
   const router = useRouter();
-  const [mode, setMode] = useState("email"); // "email" or "phone"
+  const [mode, setMode] = useState("email");
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
+  const [pendingUser, setPendingUser] = useState(null); // holds Google user pending confirmation
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
       const userCredential = await signInWithEmailAndPassword(auth, form.identifier, form.password);
       const user = userCredential.user;
-      
-      // Login notification — only fires after a real login (not existing session)
       const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
-      const loginNotif = {
-        id: `login_${Date.now()}`,
-        title: "Sign In Successful",
+      localStorage.setItem("infy_notifications", JSON.stringify([{
+        id: `login_${Date.now()}`, title: "Sign In Successful",
         body: `You signed in with ${user.email}. Welcome back!`,
-        time: new Date().toISOString(),
-        unread: true,
-        type: "login"
-      };
-      localStorage.setItem("infy_notifications", JSON.stringify([loginNotif, ...existing]));
-
-      localStorage.setItem("infy_user", JSON.stringify({ 
-        uid: user.uid,
-        email: user.email
-      }));
-      
+        time: new Date().toISOString(), unread: true, type: "login"
+      }, ...existing]));
+      localStorage.setItem("infy_user", JSON.stringify({ uid: user.uid, email: user.email }));
       router.push("/home");
     } catch (error) {
       setError(error.message);
@@ -48,39 +37,61 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      // Login notification — fires after real login
-      const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
-      const loginNotif = {
-        id: `login_${Date.now()}`,
-        title: "Sign In Successful",
-        body: `You signed in with Google as ${user.email}. Welcome back!`,
-        time: new Date().toISOString(),
-        unread: true,
-        type: "login"
-      };
-      localStorage.setItem("infy_notifications", JSON.stringify([loginNotif, ...existing]));
-      
-      localStorage.setItem("infy_user", JSON.stringify({ 
-        uid: user.uid,
-        email: user.email,
-        firstName: user.displayName?.split(' ')[0] || '',
-        lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
-        phone: '',
-        location: '',
-        avatar: user.photoURL 
-      }));
-      
-      router.push("/home");
+      // Don't finish login yet — show confirmation dialog first
+      setPendingUser(result.user);
     } catch (error) {
-      setError(error.message);
+      if (error.code !== "auth/cancelled-popup-request" && error.code !== "auth/popup-closed-by-user") {
+        setError(error.message);
+      }
     }
+  };
+
+  const confirmGoogleLogin = () => {
+    const user = pendingUser;
+    const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
+    localStorage.setItem("infy_notifications", JSON.stringify([{
+      id: `login_${Date.now()}`, title: "Sign In Successful",
+      body: `You signed in as ${user.email}. Welcome back!`,
+      time: new Date().toISOString(), unread: true, type: "login"
+    }, ...existing]));
+    localStorage.setItem("infy_user", JSON.stringify({
+      uid: user.uid, email: user.email,
+      firstName: user.displayName?.split(' ')[0] || '',
+      lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
+      phone: '', location: '', avatar: user.photoURL
+    }));
+    setPendingUser(null);
+    router.push("/home");
+  };
+
+  const cancelGoogleLogin = async () => {
+    setPendingUser(null);
+    try { await signOut(auth); } catch (e) {}
   };
 
   return (
     <div className="fixed inset-0 max-w-md mx-auto z-50 bg-white flex flex-col overflow-hidden">
       <PageHeader title="Welcome Back" subtitle="Login to continue tracking" backHref="/onboarding" />
+
+      {/* Google account confirmation dialog */}
+      {pendingUser && (
+        <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col items-center gap-4">
+            {pendingUser.photoURL && (
+              <img src={pendingUser.photoURL} alt="Avatar" className="w-16 h-16 rounded-full border-2 border-[#027027]" />
+            )}
+            <div className="text-center">
+              <p className="font-bold text-gray-900 text-base">{pendingUser.displayName || "Your Account"}</p>
+              <p className="text-sm text-gray-500 mt-0.5">{pendingUser.email}</p>
+            </div>
+            <p className="text-sm text-gray-600 text-center">Continue signing in with this account?</p>
+            <div className="flex gap-3 w-full">
+              <button onClick={cancelGoogleLogin} className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl active:scale-95 transition text-sm">Cancel</button>
+              <button onClick={confirmGoogleLogin} className="flex-1 py-3 bg-[#027027] text-white font-bold rounded-xl active:scale-95 transition text-sm shadow-md">Continue</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-6 pt-8 pb-10">
         {/* Toggle */}
