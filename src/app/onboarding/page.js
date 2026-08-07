@@ -17,13 +17,16 @@ export default function Onboarding() {
     return () => unsubscribe();
   }, []);
 
-  // Step 0: animated logo + text → step 1 after 4.8s
+  // Step 0: animated logo + text → step 1 (or home) after 4.8s
   useEffect(() => {
     if (step === 0) {
-      const t = setTimeout(() => setStep(1), 4800);
+      const t = setTimeout(() => {
+        if (userAuth) router.push("/home");
+        else setStep(1);
+      }, 4800);
       return () => clearTimeout(t);
     }
-  }, [step]);
+  }, [step, userAuth, router]);
 
   // Step 1: show onboarding 1 image for 5s then advance
   useEffect(() => {
