@@ -63,7 +63,7 @@ export default function Onboarding() {
       <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
 
         {/* Logo + text container */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
 
           {/* Logo: bounce in then float up */}
           <div style={{ animation: "logoUp 2s cubic-bezier(0.34,1.56,0.64,1) forwards" }}>
