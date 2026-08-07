@@ -7,6 +7,7 @@ import { auth, db, storage, googleProvider, signInWithPopup, RecaptchaVerifier, 
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const VACCINES = [
   "BCG", "OPV 0", "Hepatitis B (Birth Dose)", 
@@ -782,7 +783,9 @@ export default function KidsDashboard() {
             {/* Success Overlay */}
             {saveSuccess && (
               <div className="absolute inset-0 bg-white/95 rounded-3xl flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
-                <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2705/512.gif" alt="Success" className="w-32 h-32 mb-4" />
+                <div className="w-56 h-56 -mt-8 mb-2">
+                  <DotLottieReact src="/Success.lottie" loop={false} autoplay />
+                </div>
                 <h3 className="text-2xl font-black text-[#027027] mb-2">Child Added!</h3>
                 <p className="text-sm text-gray-500">{saveSuccess} successfully added.</p>
               </div>
