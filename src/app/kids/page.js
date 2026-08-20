@@ -60,14 +60,20 @@ function getLatestRecordDate(records) {
   return new Date(Math.max(...validDates.map((date) => date.getTime())));
 }
 
+function addMonths(dateValue, monthCount) {
+  const d = new Date(dateValue);
+  const result = new Date(d);
+  result.setMonth(result.getMonth() + monthCount);
+  return result;
+}
+
 function getDaysToNext(records, dob) {
   if (!dob) return 0;
   const lastDate = getLatestRecordDate(records);
   const today = new Date();
   const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const startDate = lastDate ? new Date(lastDate) : new Date(dob);
-  const nextTarget = new Date(startDate);
-  nextTarget.setMonth(nextTarget.getMonth() + 1);
+  const nextTarget = addMonths(startDate, 1);
   const diffMs = nextTarget.getTime() - todayStart.getTime();
   const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return daysLeft < 0 ? 0 : daysLeft;
@@ -77,9 +83,33 @@ function getNextDate(records, dob) {
   if (!dob) return "";
   const lastDate = getLatestRecordDate(records);
   const startDate = lastDate ? new Date(lastDate) : new Date(dob);
-  const nextTarget = new Date(startDate);
-  nextTarget.setMonth(nextTarget.getMonth() + 1);
+  const nextTarget = addMonths(startDate, 1);
   return nextTarget.toISOString().slice(0, 10);
+}
+
+function getDueState(records, dob) {
+  if (!dob) {
+    return { status: "pending", days: 0, label: "Greyed out" };
+  }
+
+  const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const today = startOfDay(new Date());
+  const lastDate = getLatestRecordDate(records);
+  const anchor = lastDate ? new Date(lastDate) : new Date(dob);
+  const dueDate = addMonths(anchor, 1);
+  const daysUntilDue = Math.ceil((startOfDay(dueDate) - today) / (1000 * 60 * 60 * 24));
+
+  if (records && Array.isArray(records) && records.length > 0) {
+    const daysSinceDone = Math.ceil((today - startOfDay(new Date(lastDate))) / (1000 * 60 * 60 * 24));
+    return { status: "done", days: daysSinceDone, label: `Done ${daysSinceDone} day${daysSinceDone === 1 ? "" : "s"} ago` };
+  }
+
+  if (daysUntilDue > 0) {
+    return { status: "pending", days: daysUntilDue, label: `Due in ${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}` };
+  }
+
+  const overdueDays = Math.abs(daysUntilDue);
+  return { status: "due", days: overdueDays, label: `Due ${overdueDays} day${overdueDays === 1 ? "" : "s"} ago` };
 }
 
 export default function KidsDashboard() {
@@ -296,8 +326,8 @@ export default function KidsDashboard() {
   // Form Modal Rendering
   if (activeForm) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4 animate-in fade-in duration-200">
-        <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-y-auto max-h-[90vh] pb-safe" style={{ scrollbarWidth: 'none' }}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4 animate-in fade-in duration-200" onClick={() => setActiveForm(null)}>
+        <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-y-auto max-h-[90vh] pb-safe" style={{ scrollbarWidth: 'none' }} onClick={(e) => e.stopPropagation()}>
           <div className="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 py-2">
             <h2 className="text-xl font-black text-[#027027] capitalize">{activeForm} Form</h2>
             <button onClick={() => setActiveForm(null)} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
@@ -562,8 +592,8 @@ export default function KidsDashboard() {
   const growth = getGrowthStage(activeKid?.dob);
   const stages = ["Newborn", "Infant", "Toddler"];
 
-  const vaccineDaysLeft = getDaysToNext(activeKid?.vaccineRecords, activeKid?.dob);
-  const weighingDaysLeft = getDaysToNext(activeKid?.weighingRecords, activeKid?.dob);
+  const vaccineState = getDueState(activeKid?.vaccineRecords, activeKid?.dob);
+  const weighingState = getDueState(activeKid?.weighingRecords, activeKid?.dob);
 
   return (
     <div className="p-4 pb-safe space-y-6">
@@ -610,20 +640,20 @@ export default function KidsDashboard() {
 
         <div className="relative z-10 grid grid-cols-2 gap-4">
           <div className="bg-white/10 rounded-2xl p-4 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
-            {vaccineDaysLeft === 0 && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
+            {vaccineState.status === "due" && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
             <Syringe className="mb-2 text-green-200" size={24} />
             <div className="flex items-end justify-center gap-1">
-              <span className={`text-2xl font-black ${vaccineDaysLeft === 0 ? 'text-red-300' : 'text-white'}`}>{vaccineDaysLeft === 0 ? 'Due' : vaccineDaysLeft}</span>
-              {vaccineDaysLeft !== 0 && <span className="text-[10px] uppercase font-bold text-green-100 mb-1">Days</span>}
+              <span className={`text-2xl font-black ${vaccineState.status === "due" ? 'text-red-300' : 'text-white'}`}>{vaccineState.status === "due" ? 'Due' : vaccineState.status === "done" ? 'Done' : vaccineState.days}</span>
+              {vaccineState.status !== "due" && vaccineState.status !== "done" && <span className="text-[10px] uppercase font-bold text-green-100 mb-1">Days</span>}
             </div>
             <span className="text-[10px] text-green-50 mt-1 opacity-80">Next Vaccine</span>
           </div>
           <div className="bg-white/10 rounded-2xl p-4 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
-            {weighingDaysLeft === 0 && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
+            {weighingState.status === "due" && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
             <Activity className="mb-2 text-yellow-200" size={24} />
             <div className="flex items-end justify-center gap-1">
-              <span className={`text-2xl font-black ${weighingDaysLeft === 0 ? 'text-red-300' : 'text-yellow-400'}`}>{weighingDaysLeft === 0 ? 'Due' : weighingDaysLeft}</span>
-              {weighingDaysLeft !== 0 && <span className="text-[10px] uppercase font-bold text-yellow-100 mb-1">Days</span>}
+              <span className={`text-2xl font-black ${weighingState.status === "due" ? 'text-red-300' : 'text-yellow-400'}`}>{weighingState.status === "due" ? 'Due' : weighingState.status === "done" ? 'Done' : weighingState.days}</span>
+              {weighingState.status !== "due" && weighingState.status !== "done" && <span className="text-[10px] uppercase font-bold text-yellow-100 mb-1">Days</span>}
             </div>
             <span className="text-[10px] text-yellow-50 mt-1 opacity-80">Next Weighing</span>
           </div>
@@ -662,13 +692,13 @@ export default function KidsDashboard() {
         <h2 className="text-[#027027] text-sm font-bold mb-3">Action Forms</h2>
         <div className="space-y-3">
 
-          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${vaccineDaysLeft === 0 ? 'bg-red-50 border-red-200' : vaccineDaysLeft === 1 ? 'bg-green-50 border-green-300' : 'bg-white border-gray-100'}`}>
+          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${vaccineState.status === "due" ? 'bg-red-50 border-red-200' : vaccineState.status === "pending" ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-200'}`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${vaccineDaysLeft === 0 ? 'bg-red-100 text-red-600' : vaccineDaysLeft === 1 ? 'bg-green-100 text-[#027027]' : 'bg-green-50 text-[#027027]'}`}>
+              <div className={`p-2 rounded-full ${vaccineState.status === "due" ? 'bg-red-100 text-red-600' : vaccineState.status === "pending" ? 'bg-gray-200 text-gray-500' : 'bg-green-100 text-[#027027]'}`}>
                 <Syringe size={18} />
               </div>
               <div>
-                <span className={`text-sm font-bold ${vaccineDaysLeft === 0 ? 'text-red-900' : vaccineDaysLeft === 1 ? 'text-[#027027]' : 'text-gray-800'}`}>Vaccination</span>
+                <span className={`text-sm font-bold ${vaccineState.status === "due" ? 'text-red-900' : vaccineState.status === "pending" ? 'text-gray-600' : 'text-[#027027]'}`}>Vaccination</span>
                 {activeKid.vaccineRecords?.length > 0 && (
                   <span className="block text-[10px] text-[#027027] mt-1 font-semibold">
                     Last: {activeKid.vaccineRecords[activeKid.vaccineRecords.length-1].vaccineName}
@@ -676,37 +706,35 @@ export default function KidsDashboard() {
                 )}
               </div>
             </div>
-            {vaccineDaysLeft === 0 ? (
-              <span className="text-xs font-bold text-red-600 px-4 py-2 rounded-xl bg-red-100">Finished</span>
-            ) : vaccineDaysLeft === 1 ? (
+            {vaccineState.status === "due" ? (
               <button onClick={() => openForm("vaccine")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
-                Open Form
+                {vaccineState.label}
               </button>
+            ) : vaccineState.status === "pending" ? (
+              <span className="text-xs font-bold text-gray-500 px-4 py-2 rounded-xl bg-gray-200">{vaccineState.label}</span>
             ) : (
-              <span className="text-xs font-bold text-gray-400 px-4 py-2 rounded-xl bg-gray-100">{vaccineDaysLeft} days</span>
+              <span className="text-xs font-bold text-[#027027] px-4 py-2 rounded-xl bg-green-100">{vaccineState.label}</span>
             )}
           </div>
 
-          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${weighingDaysLeft === 0 ? 'bg-red-50 border-red-200' : weighingDaysLeft === 1 ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-100'}`}>
+          <div className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${weighingState.status === "due" ? 'bg-red-50 border-red-200' : weighingState.status === "pending" ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-200'}`}>
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-full ${weighingDaysLeft === 0 ? 'bg-red-100 text-red-600' : weighingDaysLeft === 1 ? 'bg-yellow-100 text-yellow-600' : 'bg-yellow-50 text-yellow-600'}`}>
+              <div className={`p-2 rounded-full ${weighingState.status === "due" ? 'bg-red-100 text-red-600' : weighingState.status === "pending" ? 'bg-gray-200 text-gray-500' : 'bg-green-100 text-[#027027]'}`}>
                 <Activity size={18} />
               </div>
               <div>
-                <span className={`text-sm font-bold ${weighingDaysLeft === 0 ? 'text-red-900' : weighingDaysLeft === 1 ? 'text-yellow-700' : 'text-gray-800'}`}>Weighing</span>
+                <span className={`text-sm font-bold ${weighingState.status === "due" ? 'text-red-900' : weighingState.status === "pending" ? 'text-gray-600' : 'text-[#027027]'}`}>Weighing</span>
                 {activeKid.weight && <span className="block text-[10px] text-[#027027] mt-1 font-semibold">Last Weight: {activeKid.weight} kg</span>}
               </div>
             </div>
-            {weighingDaysLeft === 0 ? (
+            {weighingState.status === "due" ? (
               <button onClick={() => openForm("weighing")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
-                Resolve
+                {weighingState.label}
               </button>
-            ) : weighingDaysLeft === 1 ? (
-              <button onClick={() => openForm("weighing")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
-                Open Form
-              </button>
+            ) : weighingState.status === "pending" ? (
+              <span className="text-xs font-bold text-gray-500 px-4 py-2 rounded-xl bg-gray-200">{weighingState.label}</span>
             ) : (
-              <span className="text-xs font-bold text-gray-400 px-4 py-2 rounded-xl bg-gray-100">{weighingDaysLeft} days</span>
+              <span className="text-xs font-bold text-[#027027] px-4 py-2 rounded-xl bg-green-100">{weighingState.label}</span>
             )}
           </div>
 

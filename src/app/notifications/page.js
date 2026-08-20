@@ -87,6 +87,19 @@ export default function Notifications() {
   }, [user]);
 
   useEffect(() => {
+    const tickRelativeTimes = () => {
+      setNotifications(prev => prev.map((n) => ({
+        ...n,
+        time: n.timestamp ? formatRelativeTime(n.timestamp) : n.time || 'Just now'
+      })));
+    };
+
+    tickRelativeTimes();
+    const timer = setInterval(tickRelativeTimes, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     let localNotifs = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
 
     if (localNotifs.length === 0 && kids.length === 0) {

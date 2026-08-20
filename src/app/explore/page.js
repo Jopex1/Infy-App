@@ -95,12 +95,6 @@ export default function ExplorePage() {
 
   return (
     <div className="min-h-screen pb-safe">
-      <div className="bg-[#027027] text-white px-4 pt-6 pb-5 rounded-b-[28px] shadow-lg">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-green-100 mb-2">Explore</p>
-        <h1 className="text-2xl font-black">Start Exploring</h1>
-        <p className="text-sm text-green-100 mt-1">Helpful baby-care videos, milestones, and practical guidance.</p>
-      </div>
-
       {!selected ? (
         <div className="px-4 pt-5 grid grid-cols-2 gap-4 animate-in fade-in duration-300">
           {categories.map((cat, i) => (
