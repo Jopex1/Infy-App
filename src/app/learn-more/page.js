@@ -157,12 +157,13 @@ export default function LearnMore() {
                 </div>
                 <div className="aspect-video w-full">
                   <iframe
-                    src={`https://www.youtube.com/embed/${v.id}?controls=1&rel=0&modestbranding=1`}
+                    src={`https://www.youtube.com/embed/${v.id}?controls=1&rel=0&modestbranding=1&fs=1&playsinline=1`}
                     title={getTitle(v)}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     referrerPolicy="no-referrer-when-downgrade"
-                    className="w-full h-full"
+                    tabIndex="0"
+                    className="w-full h-full touch-manipulation"
                   />
                 </div>
               </div>
