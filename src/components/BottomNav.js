@@ -37,9 +37,9 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="bottom-nav-fixed fixed bottom-0 left-0 right-0 max-w-md mx-auto z-[100] bg-white border-t border-primary shadow-lg"
+      className="bottom-nav-fixed fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30 bg-white border-t border-primary shadow-[0_-6px_18px_rgba(0,0,0,0.08)]"
       style={{
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0px)',
         transform: 'translateZ(0)',
       }}
       aria-label="Main navigation"

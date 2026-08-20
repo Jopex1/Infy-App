@@ -209,7 +209,7 @@ export default function ChatPage() {
   const grouped = groupSessionsByDay(sessions);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-72px)] overflow-hidden bg-gray-50 animate-in fade-in duration-300 relative">
+    <div className="flex flex-col h-[calc(100dvh-72px)] overflow-hidden bg-gray-50 animate-in fade-in duration-300 relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}>
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={handleFileChange} />
       
       {/* Chat Pattern Background */}
@@ -357,7 +357,7 @@ export default function ChatPage() {
 
 
           {/* Prompts and Input Wrapper */}
-          <div className="fixed bottom-[72px] left-0 right-0 bg-gray-50 flex flex-col gap-2 z-10 max-w-md mx-auto px-4 py-3">
+          <div className="fixed left-0 right-0 bg-gray-50 flex flex-col gap-2 z-10 max-w-md mx-auto px-4 py-3" style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}>
             {/* Prompts */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#027027] bg-white text-[#027027] text-xs font-semibold whitespace-nowrap shadow-sm active:bg-green-50" onClick={() => handleSend("Baby has fever")}>

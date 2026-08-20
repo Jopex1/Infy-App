@@ -54,7 +54,7 @@ const stageData = {
     emoji: "🧒",
     color: "bg-green-50 border-green-200",
     badge: "bg-green-100 text-green-700",
-    description: "Children begin walking independently, become highly active, develop speech rapidly and start showing independence.",
+    description: "Toddlers begin walking independently, become highly active, develop speech rapidly, and start showing confidence and independence.",
     videos: [
       { id: "3F4XH7ACWOY" },
       { id: "VVmMK4ZcPxY" },

@@ -45,6 +45,7 @@ export default function Topbar() {
   const getPageTitle = () => {
     switch (pathname) {
       case '/home': return 'Home';
+      case '/explore': return 'Start Exploring';
       case '/kids': return 'Dashboard';
       case '/chat': return 'Contact';
       case '/notifications': return 'Notifications';
@@ -58,6 +59,9 @@ export default function Topbar() {
         return '';
     }
   };
+
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const languageOptions = ["English", "French", "Spanish", "Arabic", "Portuguese", "Swahili", "Hindi", "German", "Italian", "Chinese", "Japanese", "Korean"];
 
   const menuSections = [
     {
@@ -74,9 +78,8 @@ export default function Topbar() {
       icon: <Settings size={20}/>,
       items: [
         { label: darkMode ? "Light Mode" : "Dark Mode", action: toggleDark },
-        { label: "Language", action: () => { setMenuOpen(false); } },
+        { label: `Language: ${selectedLanguage}`, action: () => { setMenuOpen(false); } },
         { label: "Notification Settings", action: () => { setMenuOpen(false); router.push("/notifications"); } },
-        { label: "Reminder Preferences", action: () => { setMenuOpen(false); } },
       ]
     },
     {
@@ -158,8 +161,8 @@ export default function Topbar() {
 
       {menuOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setMenuOpen(false)} />
-          <div className="fixed inset-y-0 right-0 z-50 w-4/5 max-w-sm flex pointer-events-auto bg-white dark:bg-gray-900 animate-in slide-in-from-right duration-300 flex-col shadow-2xl overflow-hidden">
+          <div className="fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setMenuOpen(false)} />
+          <div className="fixed inset-y-0 right-0 z-[60] w-4/5 max-w-sm flex pointer-events-auto bg-white dark:bg-gray-900 animate-in slide-in-from-right duration-300 flex-col shadow-2xl overflow-hidden">
             {/* Watermark Logo */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-5">
                <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Watermark" width={250} height={250} style={{width: 'auto', height: 'auto'}} className="object-contain" />
@@ -190,13 +193,34 @@ export default function Topbar() {
                     {!section.action && expandedSection === idx && section.items && (
                       <div className="pl-11 pr-4 pb-3 space-y-1 animate-in fade-in duration-200">
                         {section.items.map((item, i) => (
-                          <button
-                            key={i}
-                            onClick={item.action}
-                            className="w-full text-left py-2.5 text-sm text-gray-500 dark:text-gray-400 font-medium hover:text-[#027027] dark:hover:text-[#027027] transition"
-                          >
-                            {item.label}
-                          </button>
+                          <div key={i} className="w-full">
+                            {item.label.startsWith("Language") ? (
+                              <div className="flex flex-col gap-2 py-2">
+                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500">Select Language</label>
+                                <select
+                                  value={selectedLanguage}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    setSelectedLanguage(value);
+                                    document.documentElement.lang = value.toLowerCase();
+                                    localStorage.setItem("infy_language", value);
+                                  }}
+                                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none"
+                                >
+                                  {languageOptions.map((lang) => (
+                                    <option key={lang} value={lang}>{lang}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={item.action}
+                                className="w-full text-left py-2.5 text-sm text-gray-500 dark:text-gray-400 font-medium hover:text-[#027027] dark:hover:text-[#027027] transition"
+                              >
+                                {item.label}
+                              </button>
+                            )}
+                          </div>
                         ))}
                       </div>
                     )}

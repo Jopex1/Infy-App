@@ -90,6 +90,11 @@ body {
   position: fixed !important;
   will-change: transform;
   backface-visibility: hidden;
+  z-index: 30;
+}
+
+.safe-bottom-padding {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
 @keyframes navActiveFadeIn {

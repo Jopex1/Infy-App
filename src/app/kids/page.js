@@ -47,29 +47,38 @@ function getGrowthStage(dob) {
   return { label, emoji, progressPercent, ageText };
 }
 
+function getLatestRecordDate(records) {
+  if (!Array.isArray(records) || records.length === 0) return null;
+
+  const validDates = records
+    .map((entry) => entry.dateGiven || entry.dateMeasurement || entry.nextVaccineDate || entry.nextVisitDate || entry.nextVitaminADate || entry.nextDewormingDate)
+    .filter(Boolean)
+    .map((value) => new Date(value))
+    .filter((date) => !Number.isNaN(date.getTime()));
+
+  if (validDates.length === 0) return null;
+  return new Date(Math.max(...validDates.map((date) => date.getTime())));
+}
+
 function getDaysToNext(records, dob) {
   if (!dob) return 0;
-  const birthDate = new Date(dob);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const completedMonths = (records && Array.isArray(records)) ? records.length : 0;
-  
-  const targetMonth = completedMonths === 0 ? 0 : completedMonths;
-  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + targetMonth, birthDate.getDate());
-  
-  const diffMs = nextTarget.getTime() - today.getTime();
+  const lastDate = getLatestRecordDate(records);
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startDate = lastDate ? new Date(lastDate) : new Date(dob);
+  const nextTarget = new Date(startDate);
+  nextTarget.setMonth(nextTarget.getMonth() + 1);
+  const diffMs = nextTarget.getTime() - todayStart.getTime();
   const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return daysLeft < 0 ? 0 : daysLeft;
 }
 
 function getNextDate(records, dob) {
   if (!dob) return "";
-  const birthDate = new Date(dob);
-  const completedMonths = (records && Array.isArray(records)) ? records.length : 0;
-  
-  const targetMonth = completedMonths === 0 ? 0 : completedMonths;
-  const nextTarget = new Date(birthDate.getFullYear(), birthDate.getMonth() + targetMonth, birthDate.getDate());
-  
+  const lastDate = getLatestRecordDate(records);
+  const startDate = lastDate ? new Date(lastDate) : new Date(dob);
+  const nextTarget = new Date(startDate);
+  nextTarget.setMonth(nextTarget.getMonth() + 1);
   return nextTarget.toISOString().slice(0, 10);
 }
 
@@ -167,6 +176,17 @@ export default function KidsDashboard() {
 
   const activeKid = kids[activeIndex] || null;
 
+  useEffect(() => {
+    const pending = JSON.parse(localStorage.getItem("infy_pending_action") || "null");
+    if (!pending?.type || !activeKid) return;
+
+    const validTypes = ["vaccine", "weighing", "vitaminA", "deworming"];
+    if (validTypes.includes(pending.type)) {
+      openForm(pending.type);
+      localStorage.removeItem("infy_pending_action");
+    }
+  }, [activeKid]);
+
   const openForm = (type) => {
     setActiveForm(type);
     const nextDate = getNextDate(
@@ -212,6 +232,7 @@ export default function KidsDashboard() {
       
       setIsSaving(false);
       setActiveForm(null);
+      localStorage.removeItem("infy_pending_action");
     } catch (error) {
       console.error("Error saving form:", error);
       setIsSaving(false);
@@ -677,7 +698,9 @@ export default function KidsDashboard() {
               </div>
             </div>
             {weighingDaysLeft === 0 ? (
-              <span className="text-xs font-bold text-red-600 px-4 py-2 rounded-xl bg-red-100">Finished</span>
+              <button onClick={() => openForm("weighing")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
+                Resolve
+              </button>
             ) : weighingDaysLeft === 1 ? (
               <button onClick={() => openForm("weighing")} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
                 Open Form
