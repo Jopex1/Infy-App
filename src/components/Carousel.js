@@ -83,7 +83,7 @@ export default function Carousel({ tips }) {
 
             {/* Logo watermark top-right clipped */}
             <div className="absolute -top-4 -right-2 opacity-15 w-32 h-20 pointer-events-none">
-              <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy" fill className="object-contain object-right" />
+              <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy" fill sizes="128px" className="object-contain object-right" />
             </div>
 
             <div className="mx-3">

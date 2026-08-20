@@ -131,10 +131,10 @@ export default function ExplorePage() {
                 <div className="aspect-video w-full relative bg-gray-900 rounded-t-[20px] overflow-hidden">
                   {activeVideoId === v.id ? (
                     <iframe
-                      src={`https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1&fs=1`}
+                      src={`https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&controls=1&autohide=0&playsinline=1&fs=1`}
                       title={getTitle(v)}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
-                      allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
                       tabIndex="0"
                       className="w-full h-full touch-manipulation"
                     />
