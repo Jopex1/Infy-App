@@ -1,8 +1,9 @@
-import { adminAuth } from "@/lib/firebaseAdmin";
+import { getAdminAuth } from "@/lib/firebaseAdmin";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    const adminAuth = getAdminAuth();
     const listResult = await adminAuth.listUsers(1000);
     const users = listResult.users.map(u => ({
       uid: u.uid,
@@ -24,6 +25,7 @@ export async function DELETE(request) {
   try {
     const { uid } = await request.json();
     if (!uid) return NextResponse.json({ error: "UID required" }, { status: 400 });
+    const adminAuth = getAdminAuth();
     await adminAuth.deleteUser(uid);
     return NextResponse.json({ success: true });
   } catch (err) {
