@@ -17,7 +17,7 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-[#f7f7f7]">
       <div className="flex flex-col items-center gap-4">
         <div className="relative h-20 w-20">
-          <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy logo" fill className="object-contain" priority />
+          <Image src="/icons/infy wordmark .png" alt="Infy logo" fill className="object-contain" priority />
         </div>
       </div>
     </div>

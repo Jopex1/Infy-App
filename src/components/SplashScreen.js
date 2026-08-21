@@ -44,7 +44,7 @@ export default function SplashScreen({ children }) {
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#f7f7f7]">
         <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-1000">
           <div className="relative h-24 w-40 mb-2">
-            <Image src="/icons/infy_wordmark_mono_1.png" alt="Infy Logo" fill className="object-contain" priority />
+            <Image src="/icons/infy wordmark .png" alt="Infy Logo" fill className="object-contain" priority />
           </div>
           <p className="text-[#027027] font-bold tracking-widest uppercase text-xs sm:text-sm">Your Baby's Health Tracker</p>
         </div>
