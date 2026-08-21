@@ -98,7 +98,7 @@ export default function AdminDashboard() {
           <select 
             value={activeTab} 
             onChange={e => setActiveTab(e.target.value)}
-            className="text-sm border-none outline-none rounded-lg p-1.5 font-bold"
+            className="text-sm border-none outline-none rounded-lg p-1.5 font-bold flex-1 mx-3"
             style={{ background: "#027027", color: "white" }}
           >
             <option value="overview">Overview</option>
@@ -108,6 +108,9 @@ export default function AdminDashboard() {
             <option value="learn_more_cms">Learn More</option>
             {isSuper && <option value="admins">Manage Admins</option>}
           </select>
+          <button onClick={handleLogout} className="p-2 rounded-xl transition hover:bg-white/10 flex items-center gap-1.5 text-sm font-bold shrink-0" style={{ color: "#fca5a5" }}>
+            <LogOut size={18} />
+          </button>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "#f0f7f0" }}>

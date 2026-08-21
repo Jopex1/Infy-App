@@ -37,14 +37,24 @@ export default function ExploreCMS() {
     const defaultCategories = [
       { title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [{ id: "__Uc8HVve2A" }, { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
       { title: "Vaccination", icon: "💉", image: "/images/thumbnails/vaccination.jpg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [{ id: "upcanlY0oNM" }, { id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
-      { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{id:"UqYTOziVxXI"}, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+      { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{ id: "UqYTOziVxXI" }, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
       { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "2vqhTU16Dr4" }, { id: "YfhWxMmBIW4" }] },
-      { title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
+      { title: "Health and Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
+      { title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
+      { title: "Sleep and Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
+      { title: "Safety and First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
     ];
     setLoading(true);
+    let saved = 0;
     for (let i = 0; i < defaultCategories.length; i++) {
-      await setDoc(doc(db, "content_explore", `cat_${i}`), { ...defaultCategories[i], order: i });
+      try {
+        await setDoc(doc(db, "content_explore", `cat_${i}`), { ...defaultCategories[i], order: i });
+        saved++;
+      } catch(err) {
+        console.error(`Failed to save cat_${i}:`, err);
+      }
     }
+    alert(`Saved ${saved} of ${defaultCategories.length} categories.`);
     fetchCategories();
   };
 

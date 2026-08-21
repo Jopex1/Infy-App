@@ -7,7 +7,17 @@ import { collection, getDocs } from "firebase/firestore";
 
 const PLACEHOLDER = (slot) => ({ id: `PLACEHOLDER_${slot}`, placeholder: true });
 
-// Hardcoded categories moved to Firestore: content_explore
+// Fallback hardcoded categories in case Firestore is empty or inaccessible
+const FALLBACK_CATEGORIES = [
+  { id: "cat_0", order: 0, title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [{ id: "__Uc8HVve2A" }, { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
+  { id: "cat_1", order: 1, title: "Vaccination", icon: "💉", image: "/images/thumbnails/vaccination.jpg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [{ id: "upcanlY0oNM" }, { id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
+  { id: "cat_2", order: 2, title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{ id: "UqYTOziVxXI" }, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { id: "cat_3", order: 3, title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "2vqhTU16Dr4" }, { id: "YfhWxMmBIW4" }] },
+  { id: "cat_4", order: 4, title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
+  { id: "cat_5", order: 5, title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
+  { id: "cat_6", order: 6, title: "Sleep & Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
+  { id: "cat_7", order: 7, title: "Safety & First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
+];
 
 export default function ExplorePage() {
   const [categories, setCategories] = useState([]);
@@ -22,27 +32,22 @@ export default function ExplorePage() {
   useEffect(() => {
     const fetchCats = async () => {
       try {
-        const snap = await getDocs(collection(db, "content_explore"));
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
+        const snap = await Promise.race([getDocs(collection(db, "content_explore")), timeoutPromise]);
         const cats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         cats.sort((a, b) => (a.order || 0) - (b.order || 0));
-        setCategories(cats);
-        
-        const queuedVideo = JSON.parse(localStorage.getItem("infy_open_video") || "null");
-        if (queuedVideo?.id) {
-          const category = cats.find((item) => item.videos?.some((video) => video.id === queuedVideo.id));
-          if (category) {
-            setSelected(category);
-            setActiveVideoId(queuedVideo.id);
-          }
-          localStorage.removeItem("infy_open_video");
+        if (cats.length > 0) {
+          setCategories(cats);
+        } else {
+          setCategories(FALLBACK_CATEGORIES);
         }
       } catch(err) {
-        console.error(err);
+        console.warn("Firestore fetch failed, using fallback:", err.message);
+        setCategories(FALLBACK_CATEGORIES);
       }
       setLoadingCats(false);
     };
     fetchCats();
-
     setWatchlist(JSON.parse(localStorage.getItem("infy_watchlist") || "[]"));
   }, []);
 
@@ -106,7 +111,7 @@ export default function ExplorePage() {
         <div className="px-4 pt-5 grid grid-cols-2 gap-4 animate-in fade-in duration-300">
           {categories.map((cat, i) => (
             <button key={i} onClick={() => setSelected(cat)} className={`${cat.color} border rounded-xl overflow-hidden flex flex-col items-center justify-center text-center active:scale-95 transition shadow-sm h-36 relative`}>
-              {cat.image ? (
+              {cat.image && !cat.image.startsWith('blob:') ? (
                 <img src={cat.image} alt={cat.title} className="w-full h-full object-cover" />
               ) : (
                 <>
