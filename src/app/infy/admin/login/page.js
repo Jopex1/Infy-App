@@ -10,7 +10,7 @@ const hashPassword = async (str) => {
   return Array.prototype.map.call(new Uint8Array(buf), x=>(('00'+x.toString(16)).slice(-2))).join('');
 };
 
-const SUPER_ADMIN_HASH = "8e95079a40590895f9c9b4e1f7c1bb5538d35f42c1626f25db735be971eb0579";
+const SUPER_ADMIN_HASH = "1ae3fcff1a58694ed37d127f994d077e4d0a13673427eafeb66b55ad1534a5ce";
 
 export default function AdminLogin() {
   const router = useRouter();
