@@ -12,6 +12,7 @@ import OverviewTab from "./tabs/OverviewTab";
 import ExploreCMS from "./tabs/ExploreCMS";
 import LearnMoreCMS from "./tabs/LearnMoreCMS";
 import SupportTickets from "./tabs/SupportTickets";
+import UsersTab from "./tabs/UsersTab";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -72,6 +73,7 @@ export default function AdminDashboard() {
         
         <nav className="flex-1 mt-4 space-y-1 px-3">
           <NavItem active={activeTab === "overview"} onClick={() => setActiveTab("overview")} icon={<LayoutDashboard size={20}/>} label="Overview" />
+          <NavItem active={activeTab === "users"} onClick={() => setActiveTab("users")} icon={<Users size={20}/>} label="Users & Professionals" />
           <NavItem active={activeTab === "support"} onClick={() => setActiveTab("support")} icon={<MessageSquare size={20}/>} label="Support Tickets" />
           <NavItem active={activeTab === "explore_cms"} onClick={() => setActiveTab("explore_cms")} icon={<Video size={20}/>} label="Explore Videos" />
           <NavItem active={activeTab === "learn_more_cms"} onClick={() => setActiveTab("learn_more_cms")} icon={<FileText size={20}/>} label="Learn More" />
@@ -100,6 +102,7 @@ export default function AdminDashboard() {
             style={{ background: "#027027", color: "white" }}
           >
             <option value="overview">Overview</option>
+            <option value="users">Users & Professionals</option>
             <option value="support">Support Tickets</option>
             <option value="explore_cms">Explore Videos</option>
             <option value="learn_more_cms">Learn More</option>
@@ -109,6 +112,7 @@ export default function AdminDashboard() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "#f0f7f0" }}>
           {activeTab === "overview" && <OverviewTab />}
+          {activeTab === "users" && <UsersTab />}
           {activeTab === "support" && <SupportTickets adminUser={adminUser} />}
           {activeTab === "explore_cms" && <ExploreCMS />}
           {activeTab === "learn_more_cms" && <LearnMoreCMS />}
