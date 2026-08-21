@@ -462,7 +462,7 @@ export default function KidsDashboard() {
             <div className="flex justify-center mb-2">
               <button type="button" onClick={() => fileRef.current.click()} className="relative">
                 <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-                  {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={24} className="text-[#027027]" />}
+                  {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <img src="/images/newchildicon.png" alt="Add Child" className="w-12 h-12 object-contain" />}
                 </div>
               </button>
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
@@ -815,7 +815,7 @@ export default function KidsDashboard() {
               <div className="flex justify-center mb-2">
                 <button type="button" onClick={() => fileRef.current.click()} className="relative">
                   <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-                    {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <Camera size={24} className="text-[#027027]" />}
+                    {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <img src="/images/newchildicon.png" alt="Add Child" className="w-12 h-12 object-contain" />}
                   </div>
                 </button>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
