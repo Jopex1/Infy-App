@@ -3,19 +3,21 @@ import { useState, useEffect, useMemo } from "react";
 import { ChevronLeft, Play, MoreVertical, Share2, MessageCircle, Bookmark, ChevronRight, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const PLACEHOLDER = (slot) => ({ id: `PLACEHOLDER_${slot}`, placeholder: true });
+
 const categories = [
-  { title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [{ id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
-  { title: "Vaccination", icon: "💉", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [{ id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
-  { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{ id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
-  { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "2vqhTU16Dr4" }, { id: "JvmTlvBUhuQ" }] },
-  { title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "9RVvxFNhHdI" }, { id: "Oe0hfVNfLAI" }] },
-  { title: "Safety & First Aid", icon: "🩺", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "3F4XH7ACWOY" }, { id: "wF9kO_k47Lw" }] },
-  { title: "Parenting", icon: "🏠", image: "/images/thumbnails/Parenting.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "7_2f4hKqDsw" }, { id: "v_eO4xWpT58" }] },
-  { title: "Growth Milestones", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-green-50 border-green-200", iconBg: "bg-green-100", videos: [{ id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
-  { title: "Sleep & Rest", icon: "🌙", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "eB11Lw5e8nE" }, { id: "y2jV45P4E-E" }] },
-  { title: "Hygiene & Care", icon: "🛁", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-sky-50 border-sky-200", iconBg: "bg-sky-100", videos: [{ id: "p5yC5o-Pq5k" }, { id: "Y1J9C75x24Q" }] },
-  { title: "Learning & Play", icon: "🎨", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-lime-50 border-lime-100", iconBg: "bg-lime-100", videos: [{ id: "1uMv1Hk6tZk" }, { id: "2nN4jS8yQ8E" }] },
-  { title: "Special Needs & Support", icon: "🤝", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-rose-50 border-rose-200", iconBg: "bg-rose-100", videos: [{ id: "wF9kO_k47Lw" }, { id: "7_2f4hKqDsw" }] },
+  { title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [PLACEHOLDER("NUT"), { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
+  { title: "Vaccination", icon: "💉", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [PLACEHOLDER("VAC"), { id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
+  { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [PLACEHOLDER("CHD"), { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [PLACEHOLDER("NEW"), { id: "2vqhTU16Dr4" }, { id: "JvmTlvBUhuQ" }] },
+  { title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [PLACEHOLDER("HLT"), { id: "9RVvxFNhHdI" }, { id: "Oe0hfVNfLAI" }] },
+  { title: "Safety & First Aid", icon: "🩺", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [PLACEHOLDER("SAF"), { id: "3F4XH7ACWOY" }, { id: "wF9kO_k47Lw" }] },
+  { title: "Parenting", icon: "🏠", image: "/images/thumbnails/Parenting.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [PLACEHOLDER("PAR"), { id: "7_2f4hKqDsw" }, { id: "v_eO4xWpT58" }] },
+  { title: "Growth Milestones", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-green-50 border-green-200", iconBg: "bg-green-100", videos: [PLACEHOLDER("GRW"), { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { title: "Sleep & Rest", icon: "🌙", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [PLACEHOLDER("SLP"), { id: "eB11Lw5e8nE" }, { id: "y2jV45P4E-E" }] },
+  { title: "Hygiene & Care", icon: "🛁", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-sky-50 border-sky-200", iconBg: "bg-sky-100", videos: [PLACEHOLDER("HYG"), { id: "p5yC5o-Pq5k" }, { id: "Y1J9C75x24Q" }] },
+  { title: "Learning & Play", icon: "🎨", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-lime-50 border-lime-100", iconBg: "bg-lime-100", videos: [PLACEHOLDER("LRN"), { id: "1uMv1Hk6tZk" }, { id: "2nN4jS8yQ8E" }] },
+  { title: "Special Needs & Support", icon: "🤝", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-rose-50 border-rose-200", iconBg: "bg-rose-100", videos: [PLACEHOLDER("SPN"), { id: "wF9kO_k47Lw" }, { id: "7_2f4hKqDsw" }] },
 ];
 
 export default function ExplorePage() {
@@ -45,7 +47,7 @@ export default function ExplorePage() {
     return () => { document.body.style.overflow = 'unset'; };
   }, [menuOpen]);
 
-  const allVideoIds = useMemo(() => [...new Set(categories.flatMap((cat) => cat.videos.map((v) => v.id)))], []);
+  const allVideoIds = useMemo(() => [...new Set(categories.flatMap((cat) => cat.videos.filter(v => !v.placeholder).map((v) => v.id)))], []);
 
   useEffect(() => {
     fetch("/api/youtube", {
@@ -129,12 +131,21 @@ export default function ExplorePage() {
             {selected.videos.map((v, i) => (
               <div key={i} className="bg-white rounded-[20px] shadow-sm border border-green-200 flex flex-col relative">
                 <div className="aspect-video w-full relative bg-gray-900 rounded-t-[20px] overflow-hidden">
-                  {activeVideoId === v.id ? (
+                  {v.placeholder ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 gap-2 px-4">
+                      <div className="w-14 h-14 rounded-full bg-white/80 shadow flex items-center justify-center mb-1">
+                        <Play size={26} className="text-gray-400 ml-1" />
+                      </div>
+                      <p className="text-xs font-semibold text-gray-500 text-center">YouTube link coming soon</p>
+                      <p className="text-[10px] text-gray-400 text-center">Placeholder — add video ID to code</p>
+                    </div>
+                  ) : activeVideoId === v.id ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&modestbranding=1&controls=1&autohide=0&playsinline=1&fs=1`}
                       title={getTitle(v)}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
                       referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
                       tabIndex="0"
                       className="w-full h-full touch-manipulation"
                     />
@@ -152,7 +163,11 @@ export default function ExplorePage() {
 
                 <div className="p-4 relative">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-gray-800 leading-tight flex-1 pr-2">{getTitle(v)}</h3>
+                    <h3 className="font-bold text-gray-800 leading-tight flex-1 pr-2">
+                      {v.placeholder ? (
+                        <span className="text-gray-400 italic text-sm">📌 Placeholder — add YouTube link</span>
+                      ) : getTitle(v)}
+                    </h3>
                     <div className="relative z-50">
                       <button onClick={() => setMenuOpen(menuOpen === i ? null : i)} className="text-gray-400 hover:text-gray-600 transition p-1">
                         <MoreVertical size={20} />

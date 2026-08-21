@@ -1,22 +1,14 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { Calendar, Activity, Footprints, CheckCircle, AlertCircle, Save, X, Syringe, User, Camera, Pill, TestTube } from "lucide-react";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { Calendar, Activity, Footprints, CheckCircle, AlertCircle, Save, X, Syringe, User, Camera, Pill, TestTube, History, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { auth, db, storage, googleProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "../../lib/firebase";
+import { auth, db, storage } from "../../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, onSnapshot, addDoc, updateDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-
-const VACCINES = [
-  "BCG", "OPV 0", "Hepatitis B (Birth Dose)", 
-  "Pentavalent 1", "Pentavalent 2", "Pentavalent 3", 
-  "OPV 1", "OPV 2", "OPV 3", 
-  "PCV 1", "PCV 2", "PCV 3", 
-  "Rotavirus 1", "Rotavirus 2", "IPV", 
-  "Measles/Rubella 1", "Yellow Fever", "Measles/Rubella 2"
-];
+import { computeChildHealthSummary, getDaysRemaining } from "../../lib/healthEngine";
 
 function getGrowthStage(dob) {
   if (!dob) return { label: "Newborn", emoji: "👶", ageText: "—", progressPercent: 0 };
@@ -47,71 +39,6 @@ function getGrowthStage(dob) {
   return { label, emoji, progressPercent, ageText };
 }
 
-function getLatestRecordDate(records) {
-  if (!Array.isArray(records) || records.length === 0) return null;
-
-  const validDates = records
-    .map((entry) => entry.dateGiven || entry.dateMeasurement || entry.nextVaccineDate || entry.nextVisitDate || entry.nextVitaminADate || entry.nextDewormingDate)
-    .filter(Boolean)
-    .map((value) => new Date(value))
-    .filter((date) => !Number.isNaN(date.getTime()));
-
-  if (validDates.length === 0) return null;
-  return new Date(Math.max(...validDates.map((date) => date.getTime())));
-}
-
-function addMonths(dateValue, monthCount) {
-  const d = new Date(dateValue);
-  const result = new Date(d);
-  result.setMonth(result.getMonth() + monthCount);
-  return result;
-}
-
-function getDaysToNext(records, dob) {
-  if (!dob) return 0;
-  const lastDate = getLatestRecordDate(records);
-  const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const startDate = lastDate ? new Date(lastDate) : new Date(dob);
-  const nextTarget = addMonths(startDate, 1);
-  const diffMs = nextTarget.getTime() - todayStart.getTime();
-  const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  return daysLeft < 0 ? 0 : daysLeft;
-}
-
-function getNextDate(records, dob) {
-  if (!dob) return "";
-  const lastDate = getLatestRecordDate(records);
-  const startDate = lastDate ? new Date(lastDate) : new Date(dob);
-  const nextTarget = addMonths(startDate, 1);
-  return nextTarget.toISOString().slice(0, 10);
-}
-
-function getDueState(records, dob) {
-  if (!dob) {
-    return { status: "pending", days: 0, label: "Greyed out" };
-  }
-
-  const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  const today = startOfDay(new Date());
-  const lastDate = getLatestRecordDate(records);
-  const anchor = lastDate ? new Date(lastDate) : new Date(dob);
-  const dueDate = addMonths(anchor, 1);
-  const daysUntilDue = Math.ceil((startOfDay(dueDate) - today) / (1000 * 60 * 60 * 24));
-
-  if (records && Array.isArray(records) && records.length > 0) {
-    const daysSinceDone = Math.ceil((today - startOfDay(new Date(lastDate))) / (1000 * 60 * 60 * 24));
-    return { status: "done", days: daysSinceDone, label: `Done ${daysSinceDone} day${daysSinceDone === 1 ? "" : "s"} ago` };
-  }
-
-  if (daysUntilDue > 0) {
-    return { status: "pending", days: daysUntilDue, label: `Due in ${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}` };
-  }
-
-  const overdueDays = Math.abs(daysUntilDue);
-  return { status: "due", days: overdueDays, label: `Due ${overdueDays} day${overdueDays === 1 ? "" : "s"} ago` };
-}
-
 export default function KidsDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -122,17 +49,11 @@ export default function KidsDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatarFile: null, avatarPreview: "" });
-  const [activeForm, setActiveForm] = useState(null); // "vaccine" | "weighing" | "vitaminA" | "deworming"
+  const [activeForm, setActiveForm] = useState(null); // "VACCINATION" | "GROWTH_MONITORING" | "VITAMIN_A" | "DEWORMING"
+  const [selectedActivity, setSelectedActivity] = useState(null);
   const [formData, setFormData] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
   const fileRef = useRef();
-
-  const [loginMethod, setLoginMethod] = useState("google");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [otp, setOtp] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState(null);
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
-  const [otpError, setOtpError] = useState("");
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -159,112 +80,103 @@ export default function KidsDashboard() {
     return () => unsubscribeDb();
   }, [user]);
 
-  const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Login failed", error);
-    }
-  };
+  const activeKid = kids[activeIndex] || null;
 
-  const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible'
+  // Dynamically compute child health summary using our core health engine
+  const summary = useMemo(() => {
+    return computeChildHealthSummary(activeKid);
+  }, [activeKid]);
+
+  const openForm = (activity) => {
+    setSelectedActivity(activity);
+    setActiveForm(activity.activityType);
+
+    const baseData = {
+      scheduleId: activity.scheduleId,
+      scheduledDate: activity.scheduledDate || "",
+      actualDate: new Date().toISOString().slice(0, 10),
+      nextDueDate: "",
+      clinicName: "",
+      healthWorkerName: "",
+      notes: "",
+    };
+
+    if (activity.activityType === "VACCINATION") {
+      setFormData({
+        ...baseData,
+        vaccineName: activity.vaccines ? activity.vaccines.join(", ") : "",
+      });
+    } else if (activity.activityType === "GROWTH_MONITORING") {
+      setFormData({
+        ...baseData,
+        weight: "",
+        height: "",
+        headCircumference: "",
+      });
+    } else if (activity.activityType === "VITAMIN_A") {
+      setFormData({
+        ...baseData,
+        dose: activity.dose || "",
+      });
+    } else if (activity.activityType === "DEWORMING") {
+      setFormData({
+        ...baseData,
+        medicineName: "",
+        dose: "",
       });
     }
   };
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
-    setOtpError("");
-    setIsSendingOtp(true);
-    try {
-      setupRecaptcha();
-      const appVerifier = window.recaptchaVerifier;
-      const formattedPhone = phoneNumber.startsWith("+") ? phoneNumber : `+${phoneNumber}`;
-      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-      setConfirmationResult(confirmation);
-    } catch (error) {
-      console.error("SMS Error", error);
-      setOtpError("Failed to send SMS. Check number format (include country code like +1).");
-    } finally {
-      setIsSendingOtp(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setOtpError("");
-    try {
-      await confirmationResult.confirm(otp);
-    } catch (error) {
-      console.error("OTP Error", error);
-      setOtpError("Invalid code. Please try again.");
-    }
-  };
-
-  const activeKid = kids[activeIndex] || null;
-
-  useEffect(() => {
-    const pending = JSON.parse(localStorage.getItem("infy_pending_action") || "null");
-    if (!pending?.type || !activeKid) return;
-
-    const validTypes = ["vaccine", "weighing", "vitaminA", "deworming"];
-    if (validTypes.includes(pending.type)) {
-      openForm(pending.type);
-      localStorage.removeItem("infy_pending_action");
-    }
-  }, [activeKid]);
-
-  const openForm = (type) => {
-    setActiveForm(type);
-    const nextDate = getNextDate(
-      type === "vaccine" ? activeKid?.vaccineRecords :
-      type === "weighing" ? activeKid?.weighingRecords :
-      type === "vitaminA" ? activeKid?.vitaminARecords :
-      activeKid?.dewormingRecords, 
-      activeKid?.dob
-    );
-
-    if (type === "vaccine") {
-      setFormData({ vaccineName: "", dateGiven: new Date().toISOString().slice(0,10), vaccineType: "", doseNumber: "", clinicName: "", batchNumber: "", notes: "", nextVaccineDate: nextDate });
-    } else if (type === "weighing") {
-      setFormData({ dateMeasurement: new Date().toISOString().slice(0,10), weight: "", height: "", headCircumference: "", growthStatus: "Normal", growthNotes: "", healthObservations: "", nextVisitDate: nextDate });
-    } else if (type === "vitaminA") {
-      setFormData({ dateGiven: new Date().toISOString().slice(0,10), dose: "", clinicName: "", notes: "", nextVitaminADate: nextDate });
-    } else if (type === "deworming") {
-      setFormData({ dateGiven: new Date().toISOString().slice(0,10), medicineName: "", dose: "", clinicName: "", notes: "", nextDewormingDate: nextDate });
-    }
-  };
-
   const saveForm = async () => {
-    if (!activeKid || !user) return;
+    if (!activeKid || !user || !selectedActivity) return;
     setIsSaving(true);
     
     try {
       const kidRef = doc(db, "children", activeKid.id);
       let updateData = {};
       
-      if (activeForm === "vaccine") {
-        updateData.vaccineRecords = [...(activeKid.vaccineRecords || []), formData];
-      } else if (activeForm === "weighing") {
-        updateData.weighingRecords = [...(activeKid.weighingRecords || []), formData];
-        updateData.weight = formData.weight; // Update current weight
-      } else if (activeForm === "vitaminA") {
-        updateData.vitaminARecords = [...(activeKid.vitaminARecords || []), formData];
-      } else if (activeForm === "deworming") {
-        updateData.dewormingRecords = [...(activeKid.dewormingRecords || []), formData];
+      const record = {
+        scheduleId: selectedActivity.scheduleId,
+        scheduledDate: selectedActivity.scheduledDate || "",
+        dateGiven: formData.actualDate, // Map to existing schema for compatibility
+        dateMeasurement: formData.actualDate,
+        actualDate: formData.actualDate,
+        nextDueDate: formData.nextDueDate || null,
+        clinicName: formData.clinicName || "",
+        healthWorkerName: formData.healthWorkerName || "",
+        notes: formData.notes || "",
+        recordedAt: new Date().toISOString(),
+      };
+
+      if (activeForm === "VACCINATION") {
+        record.vaccineName = formData.vaccineName;
+        record.nextVaccineDate = formData.nextDueDate || "";
+        updateData.vaccineRecords = [...(activeKid.vaccineRecords || []), record];
+      } else if (activeForm === "GROWTH_MONITORING") {
+        record.weight = formData.weight;
+        record.height = formData.height;
+        record.headCircumference = formData.headCircumference;
+        record.nextVisitDate = formData.nextDueDate || "";
+        updateData.weighingRecords = [...(activeKid.weighingRecords || []), record];
+        updateData.weight = formData.weight; // Update latest weight on root object
+      } else if (activeForm === "VITAMIN_A") {
+        record.dose = formData.dose;
+        record.nextVitaminADate = formData.nextDueDate || "";
+        updateData.vitaminARecords = [...(activeKid.vitaminARecords || []), record];
+      } else if (activeForm === "DEWORMING") {
+        record.medicineName = formData.medicineName;
+        record.dose = formData.dose;
+        record.nextDewormingDate = formData.nextDueDate || "";
+        updateData.dewormingRecords = [...(activeKid.dewormingRecords || []), record];
       }
       
-      // Fire and forget updateDoc
-      updateDoc(kidRef, updateData).catch(console.error);
+      await updateDoc(kidRef, updateData);
       
       setIsSaving(false);
       setActiveForm(null);
-      localStorage.removeItem("infy_pending_action");
+      setSelectedActivity(null);
     } catch (error) {
-      console.error("Error saving form:", error);
+      console.error("Error saving record:", error);
       setIsSaving(false);
     }
   };
@@ -305,8 +217,7 @@ export default function KidsDashboard() {
         createdAt: new Date().toISOString()
       };
       
-      // Fire and forget addDoc so UI doesn't hang waiting for server sync
-      addDoc(collection(db, "children"), childDoc).catch(console.error);
+      await addDoc(collection(db, "children"), childDoc);
       
       setIsSaving(false);
       setSaveSuccess(newKid.name);
@@ -326,67 +237,44 @@ export default function KidsDashboard() {
   // Form Modal Rendering
   if (activeForm) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4 animate-in fade-in duration-200" onClick={() => setActiveForm(null)}>
-        <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-y-auto max-h-[90vh] pb-safe" style={{ scrollbarWidth: 'none' }} onClick={(e) => e.stopPropagation()}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end justify-center p-4" onClick={() => { setActiveForm(null); setSelectedActivity(null); }}>
+        <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[90vh] pb-safe" style={{ scrollbarWidth: 'none' }} onClick={(e) => e.stopPropagation()}>
           <div className="flex justify-between items-center mb-5 sticky top-0 bg-white z-10 py-2">
-            <h2 className="text-xl font-black text-[#027027] capitalize">{activeForm} Form</h2>
-            <button onClick={() => setActiveForm(null)} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
+            <h2 className="text-xl font-black text-[#027027] capitalize">{activeForm.replace('_', ' ')} Form</h2>
+            <button onClick={() => { setActiveForm(null); setSelectedActivity(null); }} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
           </div>
 
+          <p className="text-xs font-bold text-gray-500 mb-4 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+            🏥 Milestone: {selectedActivity?.title}
+          </p>
+
           <div className="space-y-4">
-            {activeForm === "vaccine" && (
+            {activeForm === "VACCINATION" && (
               <>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Vaccine Name</label>
-                  <select required value={formData.vaccineName} onChange={e => setFormData({...formData, vaccineName: e.target.value})}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm text-gray-700">
-                    <option value="">Select Vaccine</option>
-                    {VACCINES.map(v => <option key={v} value={v}>{v}</option>)}
-                  </select>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Date Given</label>
-                    <input type="date" value={formData.dateGiven} onChange={e => setFormData({...formData, dateGiven: e.target.value})}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Dose Number</label>
-                    <input type="text" value={formData.doseNumber} onChange={e => setFormData({...formData, doseNumber: e.target.value})}
-                      placeholder="e.g. 1, 2"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Vaccine Type</label>
-                    <input type="text" value={formData.vaccineType} onChange={e => setFormData({...formData, vaccineType: e.target.value})}
-                      placeholder="Oral, Injectable" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Batch No (Opt)</label>
-                    <input type="text" value={formData.batchNumber} onChange={e => setFormData({...formData, batchNumber: e.target.value})}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
-                  </div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Date Given</label>
+                  <input type="date" value={formData.actualDate} onChange={e => setFormData({...formData, actualDate: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Health Facility / Doctor (Opt)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Vaccine Name</label>
+                  <input type="text" value={formData.vaccineName} onChange={e => setFormData({...formData, vaccineName: e.target.value})}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Clinic Name</label>
                   <input type="text" value={formData.clinicName} onChange={e => setFormData({...formData, clinicName: e.target.value})}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Notes (Opt)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Notes</label>
                   <textarea value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} rows={2}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-[#027027] text-sm resize-none" />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-[#027027] uppercase mb-1 block">Next Vaccination Date</label>
-                  <input type="date" disabled value={formData.nextVaccineDate} className="w-full bg-green-50 border border-green-200 rounded-xl px-4 py-2.5 outline-none text-[#027027] text-sm font-bold opacity-80" />
                 </div>
               </>
             )}
 
-            {activeForm === "weighing" && (
+            {activeForm === "GROWTH_MONITORING" && (
               <>
                 <div>
                   <label className="text-xs font-bold text-gray-400 uppercase mb-1 block">Date of Measurement</label>
@@ -591,9 +479,6 @@ export default function KidsDashboard() {
 
   const growth = getGrowthStage(activeKid?.dob);
   const stages = ["Newborn", "Infant", "Toddler"];
-
-  const vaccineState = getDueState(activeKid?.vaccineRecords, activeKid?.dob);
-  const weighingState = getDueState(activeKid?.weighingRecords, activeKid?.dob);
 
   return (
     <div className="p-4 pb-safe space-y-6">
