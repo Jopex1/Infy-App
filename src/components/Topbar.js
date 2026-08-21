@@ -15,16 +15,24 @@ export default function Topbar() {
   const [languageDialog, setLanguageDialog] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const [hasUnread, setHasUnread] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
 
   useEffect(() => {
     const checkUnread = () => {
       const notifs = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
-      setHasUnread(notifs.some(n => n.unread));
+      const nextUnreadCount = notifs.filter(n => n.unread).length;
+      setHasUnread(nextUnreadCount > 0);
+      setUnreadCount(nextUnreadCount);
     };
+
+    const storedLanguage = localStorage.getItem("infy_language");
+    if (storedLanguage) {
+      setSelectedLanguage(storedLanguage);
+    }
+
     checkUnread();
     window.addEventListener("storage", checkUnread);
-    // Also interval to catch changes in same window without storage event if needed, but storage event is good across tabs.
-    // We'll use a small interval just to be safe for same-window updates.
     const interval = setInterval(checkUnread, 2000);
     return () => {
       window.removeEventListener("storage", checkUnread);
@@ -61,7 +69,6 @@ export default function Topbar() {
     }
   };
 
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
   const languageOptions = ["English", "French", "Spanish", "Arabic", "Portuguese", "Swahili", "Hindi", "German", "Italian", "Chinese", "Japanese", "Korean"];
 
   const menuSections = [
@@ -111,7 +118,7 @@ export default function Topbar() {
     },
     {
       title: "Notifications",
-      badge: hasUnread ? (JSON.parse(localStorage.getItem('infy_notifications') || '[]').filter(n => n.unread).length) : 0,
+      badge: unreadCount,
       icon: (
         <div className="relative">
           <Bell size={20}/>
