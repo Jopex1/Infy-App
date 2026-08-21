@@ -86,13 +86,13 @@ export default function LearnMoreCMS() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border" style={{ borderColor: '#c8e6c9' }}>
         <div>
-          <h2 className="text-xl font-black text-gray-900">Learn More Content</h2>
-          <p className="text-sm text-gray-500">Edit text and links for the Learn More articles.</p>
+          <h2 className="text-xl font-black" style={{ color: '#014d1a' }}>Learn More Content</h2>
+          <p className="text-sm mt-1" style={{ color: '#4caf50' }}>Edit text and links for the Learn More articles.</p>
         </div>
         {sections.length === 0 && (
-          <button onClick={handleInitDefaults} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl">
+          <button onClick={handleInitDefaults} className="text-white font-bold py-2 px-4 rounded-xl" style={{ background: '#027027' }}>
             Initialize Default Data
           </button>
         )}

@@ -47,9 +47,9 @@ export default function SupportTickets({ adminUser }) {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h2 className="text-xl font-black text-gray-900">Support & Health Tickets</h2>
-        <p className="text-sm text-gray-500">Manage user messages and forward to doctors.</p>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border" style={{ borderColor: '#c8e6c9' }}>
+        <h2 className="text-xl font-black" style={{ color: '#014d1a' }}>Support & Health Tickets</h2>
+        <p className="text-sm mt-1" style={{ color: '#4caf50' }}>Manage user messages and forward to doctors.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -77,11 +77,11 @@ export default function SupportTickets({ adminUser }) {
 
             <div className="flex gap-2 justify-end mt-2">
               {ticket.status !== 'resolved' && (
-                <button onClick={() => handleResolve(ticket)} className="px-4 py-2 bg-green-50 text-green-700 hover:bg-green-100 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                <button onClick={() => handleResolve(ticket)} className="px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2" style={{ background: '#e8f5e9', color: '#027027' }}>
                   <CheckCircle size={16} /> Mark Resolved
                 </button>
               )}
-              <button onClick={() => handleForward(ticket)} className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-sm">
+              <button onClick={() => handleForward(ticket)} className="px-4 py-2 text-white rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-sm" style={{ background: '#027027' }}>
                 <Forward size={16} /> Forward to Doctor
               </button>
             </div>

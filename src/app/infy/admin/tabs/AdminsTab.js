@@ -59,28 +59,28 @@ export default function AdminsTab() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <UserPlus size={20} className="text-green-600" /> Create Sub-Admin
-        </h3>
-        <form onSubmit={handleAddAdmin} className="flex flex-col sm:flex-row gap-4 items-end">
-          <div className="flex-1 w-full">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1">Username</label>
-            <input required type="text" value={newAdmin.username} onChange={e => setNewAdmin({...newAdmin, username: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-[#027027]" placeholder="e.g. nurse_jane" />
-          </div>
-          <div className="flex-1 w-full">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1">Password</label>
-            <input required type="text" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 outline-none focus:border-[#027027]" placeholder="Assign a secure password" />
-          </div>
-          <button type="submit" className="bg-[#027027] hover:bg-green-800 text-white font-bold py-2 px-6 rounded-xl shadow-md transition whitespace-nowrap h-10 w-full sm:w-auto">
-            Create Admin
-          </button>
-        </form>
-        <p className="text-xs text-gray-500 mt-4">They will log in using infysupport5@gmail.com and the credentials above.</p>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border" style={{ borderColor: '#c8e6c9' }}>
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: '#014d1a' }}>
+        <UserPlus size={20} style={{ color: '#027027' }} /> Create Sub-Admin
+      </h3>
+      <form onSubmit={handleAddAdmin} className="flex flex-col sm:flex-row gap-4 items-end">
+        <div className="flex-1 w-full">
+          <label className="text-xs font-bold uppercase tracking-wide block mb-1" style={{ color: '#027027' }}>Username</label>
+          <input required type="text" value={newAdmin.username} onChange={e => setNewAdmin({...newAdmin, username: e.target.value})} className="w-full rounded-xl px-4 py-2 outline-none border" style={{ background: '#f0f7f0', borderColor: '#c8e6c9' }} placeholder="e.g. nurse_jane" />
+        </div>
+        <div className="flex-1 w-full">
+          <label className="text-xs font-bold uppercase tracking-wide block mb-1" style={{ color: '#027027' }}>Password</label>
+          <input required type="text" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} className="w-full rounded-xl px-4 py-2 outline-none border" style={{ background: '#f0f7f0', borderColor: '#c8e6c9' }} placeholder="Assign a secure password" />
+        </div>
+        <button type="submit" className="text-white font-bold py-2 px-6 rounded-xl shadow-md transition whitespace-nowrap h-10 w-full sm:w-auto" style={{ background: '#027027' }}>
+          Create Admin
+        </button>
+      </form>
+      <p className="text-xs mt-4" style={{ color: '#9e9e9e' }}>They will log in using infysupport5@gmail.com and the credentials above.</p>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Current Sub-Admins ({admins.length})</h3>
+      <div className="bg-white p-6 rounded-2xl shadow-sm border" style={{ borderColor: '#c8e6c9' }}>
+        <h3 className="text-lg font-bold mb-4" style={{ color: '#014d1a' }}>Current Sub-Admins ({admins.length})</h3>
         {loading ? <p className="text-gray-500">Loading...</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
