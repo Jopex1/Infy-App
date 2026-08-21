@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Play, MoreVertical, Share2, MessageCircle, Bookmark, ChevronRight, ChevronDown, ChevronUp, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 function getGrowthStage(dob) {
   if (!dob) return "Newborn";
@@ -137,30 +139,6 @@ const stageData = {
   },
 };
 
-function DescriptionCard({ color, badge, range, shortDescription, fullDescription }) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <div className={`${color} border rounded-3xl p-5 shadow-sm`}>
-      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badge} mb-2 inline-block`}>{range}</span>
-      <p className="text-sm text-gray-700 leading-relaxed">
-        {expanded ? (
-          <>
-            {fullDescription.split("\n\n").map((para, i) => (
-              <span key={i}>{para}{i < fullDescription.split("\n\n").length - 1 && <><br /><br /></>}</span>
-            ))}
-            {" "}
-            <button onClick={() => setExpanded(false)} className="text-[#027027] font-bold text-xs">Read Less</button>
-          </>
-        ) : (
-          <>
-            {shortDescription}{" "}
-            <button onClick={() => setExpanded(true)} className="text-[#027027] font-bold text-xs">Read More</button>
-          </>
-        )}
-      </p>
-    </div>
-  );
-}
 
 function Accordion({ title, short, full }) {
   const [open, setOpen] = useState(false);
@@ -195,20 +173,73 @@ function Accordion({ title, short, full }) {
   );
 }
 
-export default function LearnMore() {
+function DescriptionCard({ color, badge, range, shortDescription, fullDescription }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className={`${color} border rounded-3xl p-5 shadow-sm`}>
+      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${badge} mb-2 inline-block`}>{range}</span>
+      <p className="text-sm text-gray-700 leading-relaxed">
+        {expanded ? (
+          <>
+            {fullDescription.split("\n\n").map((para, i) => (
+              <span key={i}>{para}{i < fullDescription.split("\n\n").length - 1 && <><br /><br /></>}</span>
+            ))}
+            {" "}
+            <button onClick={() => setExpanded(false)} className="text-[#027027] font-bold text-xs">Read Less</button>
+          </>
+        ) : (
+          <>
+            {shortDescription}{" "}
+            <button onClick={() => setExpanded(true)} className="text-[#027027] font-bold text-xs">Read More</button>
+          </>
+        )}
+      </p>
+    </div>
+  );
+}
+
+export default function LearnMorePage() {
   const router = useRouter();
-  const [stageLabel, setStageLabel] = useState("Newborn");
+  const [activeKid, setActiveKid] = useState(null);
+  const [stageKey, setStageKey] = useState("Newborn");
+  const [expandedText, setExpandedText] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
   const [activeVideoKey, setActiveVideoKey] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
+  const [dynamicStageData, setDynamicStageData] = useState(stageData);
 
   useEffect(() => {
+    const fetchLearnMoreData = async () => {
+      try {
+        const snap = await getDocs(collection(db, "content_learn_more"));
+        if (!snap.empty) {
+          const newData = { ...stageData };
+          snap.docs.forEach(doc => {
+            const id = doc.id; 
+            const key = id.charAt(0).toUpperCase() + id.slice(1);
+            if (newData[key]) {
+              newData[key] = {
+                ...newData[key],
+                shortDescription: doc.data().description || newData[key].shortDescription,
+                fullDescription: doc.data().fullDescription || newData[key].fullDescription,
+                titleOverride: doc.data().title || null,
+                linkOverride: doc.data().link || null,
+              };
+            }
+          });
+          setDynamicStageData(newData);
+        }
+      } catch (err) {
+        console.error("Error fetching learn more content", err);
+      }
+    };
+    fetchLearnMoreData();
+
     const kids = localStorage.getItem("infy_kids");
     if (kids) {
       const parsed = JSON.parse(kids);
       if (parsed.length > 0) {
-        const stage = getGrowthStage(parsed[0].dob);
-        setStageLabel(stage);
+        setStageKey(getGrowthStage(parsed[0].dob));
       }
     }
     setWatchlist(JSON.parse(localStorage.getItem("infy_watchlist") || "[]"));
@@ -219,7 +250,7 @@ export default function LearnMore() {
     return () => { document.body.style.overflow = "unset"; };
   }, [menuOpen]);
 
-  const stage = stageData[stageLabel];
+  const currentStage = dynamicStageData[stageKey] || dynamicStageData["Newborn"];
 
   const getCardKey = (v, i) => `${v.id}_${i}`;
 
@@ -268,10 +299,10 @@ export default function LearnMore() {
 
       {/* Header */}
       <div className="pt-6 pb-4 px-6 flex items-center gap-4">
-        <div className="text-4xl">{stage.emoji}</div>
+        <div className="text-4xl">{currentStage.emoji}</div>
         <div>
-          <h1 className="text-gray-900 text-2xl font-bold leading-tight">{stageLabel} Stage</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{stage.range}</p>
+          <h1 className="text-gray-900 text-2xl font-bold leading-tight">{stageKey} Stage</h1>
+          <p className="text-gray-500 text-sm mt-0.5">{currentStage.range}</p>
         </div>
       </div>
 
@@ -279,17 +310,17 @@ export default function LearnMore() {
 
         {/* Description */}
         <DescriptionCard
-          color={stage.color}
-          badge={stage.badge}
-          range={stage.range}
-          shortDescription={stage.shortDescription}
-          fullDescription={stage.fullDescription}
+          color={currentStage.color}
+          badge={currentStage.badge}
+          range={currentStage.range}
+          shortDescription={currentStage.shortDescription}
+          fullDescription={currentStage.fullDescription}
         />
 
         {/* Accordion Sections */}
         <div className="space-y-3">
           <h2 className="text-sm font-bold text-[#027027] uppercase tracking-wide">Key Information</h2>
-          {stage.sections.map((s, i) => (
+          {currentStage.sections.map((s, i) => (
             <Accordion key={i} title={s.title} short={s.short} full={s.full} />
           ))}
         </div>
@@ -301,7 +332,7 @@ export default function LearnMore() {
             {menuOpen !== null && (
               <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px]" onClick={() => setMenuOpen(null)} onTouchStart={() => setMenuOpen(null)} />
             )}
-            {stage.videos.map((v, i) => {
+            {currentStage.videos.map((v, i) => {
               const cardKey = getCardKey(v, i);
               const isActive = activeVideoKey === cardKey;
               const inWatchlist = watchlist.some(w => w.key === cardKey);

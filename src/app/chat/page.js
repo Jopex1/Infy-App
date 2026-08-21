@@ -435,11 +435,36 @@ export default function ChatPage() {
             </p>
           </div>
 
-          <form onSubmit={(e) => {
+          <form onSubmit={async (e) => {
             e.preventDefault();
-            const subject = encodeURIComponent(e.target.subject.value);
-            const message = encodeURIComponent(e.target.message.value);
-            window.location.href = `mailto:infysupport5@gmail.com?subject=${subject}&body=${message}`;
+            const subject = e.target.subject.value;
+            const message = e.target.message.value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Sending...";
+            btn.disabled = true;
+            try {
+              const { db, auth } = await import("@/lib/firebase");
+              const { collection, addDoc } = await import("firebase/firestore");
+              const userEmail = auth?.currentUser?.email || "Anonymous User";
+              
+              await addDoc(collection(db, "support_tickets"), {
+                subject,
+                message,
+                type: "health",
+                userEmail,
+                status: "pending",
+                createdAt: new Date().toISOString()
+              });
+              
+              alert("Your message has been sent to our pediatric team!");
+              e.target.reset();
+            } catch (err) {
+              alert("Error sending message: " + err.message);
+            } finally {
+              btn.innerText = originalText;
+              btn.disabled = false;
+            }
           }} className="space-y-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Subject</label>
@@ -451,8 +476,8 @@ export default function ChatPage() {
               <textarea required name="message" rows={6} placeholder="Describe your baby's symptoms or questions in detail..."
                 className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#027027] text-sm text-gray-800 resize-none" />
             </div>
-            <button type="submit" className="w-full bg-[#027027] text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition">
-              Compose Email to Doctor
+            <button type="submit" className="w-full bg-[#027027] text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition disabled:opacity-50">
+              Submit to Pediatrician
             </button>
           </form>
         </div>
