@@ -114,14 +114,7 @@ export default function Notifications() {
 
     if (kids.length > 0) {
       kids.forEach((k) => {
-        dynamicNotifs.unshift({
-          id: `profile_${k.id}`,
-          title: "New Profile Added",
-          desc: `Tracking initialized for ${k.name}. We'll monitor upcoming weigh-ins!`,
-          time: "Just now",
-          timestamp: Date.now(),
-          unread: true
-        });
+
 
         const vaccineDaysLeft = getDaysToNext(k.vaccineRecords, k.dob);
         const weighingDaysLeft = getDaysToNext(k.weighingRecords, k.dob);
@@ -155,7 +148,7 @@ export default function Notifications() {
         kidId: 'Watchlist',
         kidName: 'Watchlist',
         title: item.title,
-        desc: item.addedAt ? `This video was added to your watchlist on ${new Date(item.addedAt).toLocaleString()}.` : 'You added this video to your watchlist to view later.',
+        desc: 'You added this video to your watchlist to view later.',
         videoId: item.id,
         timestamp: item.addedAt ? new Date(item.addedAt).getTime() : Date.now()
       });

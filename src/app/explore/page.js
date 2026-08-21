@@ -6,18 +6,18 @@ import { useRouter } from "next/navigation";
 const PLACEHOLDER = (slot) => ({ id: `PLACEHOLDER_${slot}`, placeholder: true });
 
 const categories = [
-  { title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [PLACEHOLDER("NUT"), { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
-  { title: "Vaccination", icon: "💉", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [PLACEHOLDER("VAC"), { id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
-  { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [PLACEHOLDER("CHD"), { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
-  { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [PLACEHOLDER("NEW"), { id: "2vqhTU16Dr4" }, { id: "JvmTlvBUhuQ" }] },
-  { title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [PLACEHOLDER("HLT"), { id: "9RVvxFNhHdI" }, { id: "Oe0hfVNfLAI" }] },
-  { title: "Safety & First Aid", icon: "🩺", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [PLACEHOLDER("SAF"), { id: "3F4XH7ACWOY" }, { id: "wF9kO_k47Lw" }] },
-  { title: "Parenting", icon: "🏠", image: "/images/thumbnails/Parenting.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [PLACEHOLDER("PAR"), { id: "7_2f4hKqDsw" }, { id: "v_eO4xWpT58" }] },
-  { title: "Growth Milestones", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-green-50 border-green-200", iconBg: "bg-green-100", videos: [PLACEHOLDER("GRW"), { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
-  { title: "Sleep & Rest", icon: "🌙", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [PLACEHOLDER("SLP"), { id: "eB11Lw5e8nE" }, { id: "y2jV45P4E-E" }] },
-  { title: "Hygiene & Care", icon: "🛁", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-sky-50 border-sky-200", iconBg: "bg-sky-100", videos: [PLACEHOLDER("HYG"), { id: "p5yC5o-Pq5k" }, { id: "Y1J9C75x24Q" }] },
-  { title: "Learning & Play", icon: "🎨", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-lime-50 border-lime-100", iconBg: "bg-lime-100", videos: [PLACEHOLDER("LRN"), { id: "1uMv1Hk6tZk" }, { id: "2nN4jS8yQ8E" }] },
-  { title: "Special Needs & Support", icon: "🤝", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-rose-50 border-rose-200", iconBg: "bg-rose-100", videos: [PLACEHOLDER("SPN"), { id: "wF9kO_k47Lw" }, { id: "7_2f4hKqDsw" }] },
+  { title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [{ id: "__Uc8HVve2A" }, { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
+  { title: "Vaccination", icon: "💉", image: "/images/thumbnails/vaccination.jpg", color: "bg-[#e8ece5] border-[#c0d1b6]", iconBg: "bg-green-100", videos: [{ id: "upcanlY0oNM" }, { id: "LRdoBofFcNs" }, { id: "kQWiSM-98MA" }] },
+  { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{id:"UqYTOziVxXI"}, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "2vqhTU16Dr4" }, { id: "YfhWxMmBIW4" }] },
+  { title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
+  { title: "Safety & First Aid", icon: "🩺", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "8uaXpRRvHaU" }, { id: "6NYrugeiLKg" }] },
+  { title: "Parenting", icon: "🏠", image: "/images/thumbnails/Parenting.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "4HBgE57hbkU" }, { id: "YkKNJzeD5mg" }, { id: "MiMNbZstp68" }] },
+  { title: "Growth Milestones", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-green-50 border-green-200", iconBg: "bg-green-100", videos: [{id:"SBFnO2FCdeE"}, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { title: "Sleep & Rest", icon: "🌙", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "j0M4v24gSaw" }, { id: "SfCxUG1nE84" }, { id: "se00vkpziuU" }] },
+  { title: "Hygiene & Care", icon: "🛁", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-sky-50 border-sky-200", iconBg: "bg-sky-100", videos: [{ id: "T4-GP2bjRpc&t=39s" }, { id: "8z1bzMdlZs" }, { id: "-L-OFiTDGdk" }] },
+  { title: "Learning & Play", icon: "🎨", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-lime-50 border-lime-100", iconBg: "bg-lime-100", videos: [{ id: "lIWl4Kd2BC4" }, { id: "eqLa4vcCwJU" }, { id: "kc7nN-r5y2I" }] },
+  { title: "Special Needs & Support", icon: "🤝", image: "/images/thumbnails/special needs and support.jpeg", color: "bg-rose-50 border-rose-200", iconBg: "bg-rose-100", videos: [{ id: "m8ec2paaoUg" }, { id: "XLf22D3JiUk" }, { id: "Siq9MKlsEjM" }] },
 ];
 
 export default function ExplorePage() {
@@ -100,7 +100,7 @@ export default function ExplorePage() {
       {!selected ? (
         <div className="px-4 pt-5 grid grid-cols-2 gap-4 animate-in fade-in duration-300">
           {categories.map((cat, i) => (
-            <button key={i} onClick={() => setSelected(cat)} className={`${cat.color} border rounded-3xl overflow-hidden flex flex-col items-center justify-center text-center active:scale-95 transition shadow-sm h-36 relative`}>
+            <button key={i} onClick={() => setSelected(cat)} className={`${cat.color} border rounded-xl overflow-hidden flex flex-col items-center justify-center text-center active:scale-95 transition shadow-sm h-36 relative`}>
               {cat.image ? (
                 <img src={cat.image} alt={cat.title} className="w-full h-full object-cover" />
               ) : (
@@ -208,7 +208,7 @@ export default function ExplorePage() {
                               } else {
                                 current.push({ id: v.id, title: getTitle(v), addedAt: new Date().toISOString() });
                                 const notifs = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
-                                notifs.unshift({ id: `wl_${Date.now()}`, title: "Video Added to Watchlist", desc: `This video was added to your watchlist on ${new Date().toLocaleString()}.`, time: "Just now", unread: true, type: "watchlist", timestamp: Date.now() });
+                                notifs.unshift({ id: `wl_${Date.now()}`, title: "Video Added to Watchlist", desc: `"${getTitle(v)}" was added to your watchlist.`, time: "Just now", unread: true, type: "watchlist", timestamp: Date.now() });
                                 localStorage.setItem("infy_notifications", JSON.stringify(notifs));
                                 window.dispatchEvent(new Event("storage"));
                                 alert("Added to Action Forms in notifications!");

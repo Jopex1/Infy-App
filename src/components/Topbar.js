@@ -12,6 +12,7 @@ export default function Topbar() {
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
   const [logoutDialog, setLogoutDialog] = useState(false);
+  const [languageDialog, setLanguageDialog] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const [hasUnread, setHasUnread] = useState(false);
 
@@ -78,7 +79,7 @@ export default function Topbar() {
       icon: <Settings size={20}/>,
       items: [
         { label: darkMode ? "Light Mode" : "Dark Mode", action: toggleDark },
-        { label: `Language: ${selectedLanguage}`, action: () => { setMenuOpen(false); } },
+        { label: `Language: ${selectedLanguage}`, action: () => { setMenuOpen(false); setLanguageDialog(true); } },
         { label: "Notification Settings", action: () => { setMenuOpen(false); router.push("/notifications"); } },
       ]
     },
@@ -282,6 +283,38 @@ export default function Topbar() {
                 router.push("/onboarding");
               }} className="flex-1 py-3 bg-rose-600 text-white font-bold rounded-xl active:scale-95 transition text-sm shadow-sm">Log Out</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Language Dialog */}
+      {languageDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1a1a1a] rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200 text-center">
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Select Language</h3>
+            <p className="text-sm text-gray-500 mb-6">Choose your preferred language for the app.</p>
+            <div className="grid grid-cols-2 gap-2 mb-6 max-h-[40vh] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
+              {languageOptions.map(lang => (
+                <button
+                  key={lang}
+                  onClick={() => {
+                    setSelectedLanguage(lang);
+                    setLanguageDialog(false);
+                    // In a real app we would i18n the UI here
+                  }}
+                  className={`py-3 px-4 rounded-xl text-sm font-bold transition-all border shadow-sm active:scale-95 ${
+                    selectedLanguage === lang
+                      ? "bg-[#027027] text-white border-[#027027]"
+                      : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setLanguageDialog(false)} className="w-full text-gray-500 font-bold py-3 hover:text-gray-700 transition">
+              Cancel
+            </button>
           </div>
         </div>
       )}

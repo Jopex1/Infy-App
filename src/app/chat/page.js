@@ -41,9 +41,26 @@ export default function ChatPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [activeTab, setActiveTab] = useState("ai"); // "ai" | "expert"
   const [isRecording, setIsRecording] = useState(false);
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const pendingVideoRef = useRef(null);
+
+  // Lift the input bar above the keyboard using VisualViewport API
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => {
+      const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      setKeyboardOffset(offset);
+    };
+    vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
+    };
+  }, []);
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -257,9 +274,14 @@ export default function ChatPage() {
           </div>
           
           {activeTab === "ai" && (
-            <button onClick={() => setShowHistory(true)} className="text-[#027027] p-2.5 ml-1 active:scale-95 transition">
-              <Clock size={20} />
-            </button>
+            <div className="flex items-center">
+              <button onClick={() => { if(confirm("Clear current conversation?")) startNewChat(); }} className="text-gray-400 p-2.5 ml-1 active:scale-95 transition" title="Clear">
+                <Trash2 size={20} />
+              </button>
+              <button onClick={() => setShowHistory(true)} className="text-[#027027] p-2.5 ml-1 active:scale-95 transition" title="History">
+                <Clock size={20} />
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -287,7 +309,7 @@ export default function ChatPage() {
                     + New Conversation
                   </button>
                   <button onClick={clearAll} className="w-full border border-red-200 text-red-500 hover:bg-red-50 font-bold py-2.5 rounded-xl text-sm active:scale-95 transition">
-                    Clear All History
+                    Clear Conversations
                   </button>
                 </div>
                 
@@ -357,7 +379,7 @@ export default function ChatPage() {
 
 
           {/* Prompts and Input Wrapper */}
-          <div className="fixed left-0 right-0 bg-gray-50 flex flex-col gap-2 z-10 max-w-md mx-auto px-4 py-3" style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}>
+          <div className="fixed left-0 right-0 bg-gray-50 flex flex-col gap-2 z-10 max-w-md mx-auto px-4 py-3" style={{ bottom: `calc(72px + env(safe-area-inset-bottom, 0px) + ${keyboardOffset}px)` }}>
             {/* Prompts */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#027027] bg-white text-[#027027] text-xs font-semibold whitespace-nowrap shadow-sm active:bg-green-50" onClick={() => handleSend("Baby has fever")}>

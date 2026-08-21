@@ -25,7 +25,7 @@ export default function Login() {
       localStorage.setItem("infy_notifications", JSON.stringify([{
         id: `login_${Date.now()}`, title: "Sign In Successful",
         body: `You signed in with ${user.email}. Welcome back!`,
-        time: new Date().toISOString(), unread: true, type: "login"
+        time: "Just now", timestamp: Date.now(), unread: true, type: "login"
       }, ...existing]));
       localStorage.setItem("infy_user", JSON.stringify({ uid: user.uid, email: user.email }));
       router.push("/home");
@@ -52,7 +52,7 @@ export default function Login() {
     localStorage.setItem("infy_notifications", JSON.stringify([{
       id: `login_${Date.now()}`, title: "Sign In Successful",
       body: `You signed in as ${user.email}. Welcome back!`,
-      time: new Date().toISOString(), unread: true, type: "login"
+      time: "Just now", timestamp: Date.now(), unread: true, type: "login"
     }, ...existing]));
     localStorage.setItem("infy_user", JSON.stringify({
       uid: user.uid, email: user.email,

@@ -59,7 +59,7 @@ export default function SignUp() {
           id: `signup_${user.uid}`,
           title: `Welcome to Infy, ${form.firstName}!`,
           body: "Your account has been created. Start tracking your child's growth today.",
-          time: new Date().toISOString(),
+          time: "Just now", timestamp: Date.now(),
           unread: true,
           type: "signup"
         };
@@ -96,7 +96,7 @@ export default function SignUp() {
           id: `signup_${user.uid}`,
           title: `Welcome to Infy, ${user.displayName?.split(' ')[0] || 'there'}!`,
           body: "Your account has been created. Start tracking your child's growth today.",
-          time: new Date().toISOString(),
+          time: "Just now", timestamp: Date.now(),
           unread: true,
           type: "signup"
         };
