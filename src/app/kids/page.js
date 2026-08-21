@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef, useMemo } from "react";
-import { Calendar, Activity, Footprints, CheckCircle, AlertCircle, Save, X, Syringe, User, Camera, Pill, TestTube, History, Plus } from "lucide-react";
+import { Calendar, Activity, Footprints, CheckCircle, AlertCircle, Save, X, Syringe, User, Camera, Pill, TestTube, History, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { auth, db, storage } from "../../lib/firebase";
@@ -53,6 +53,7 @@ export default function KidsDashboard() {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [formData, setFormData] = useState({});
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [healthView, setHealthView] = useState("active");
   const fileRef = useRef();
 
   useEffect(() => {
@@ -619,41 +620,48 @@ export default function KidsDashboard() {
           <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md">{growth.label}</span>
         </div>
 
+        <style>{`
+          @keyframes dash-scroll { to { stroke-dashoffset: -20; } }
+          @keyframes overdue-stroke {
+            0%, 100% { border-color: #ffffff; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.45); }
+            50% { border-color: #ef4444; box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.9); }
+          }
+          .overdue-border {
+            border: 1px solid #ffffff;
+            animation: overdue-stroke 1.8s ease-in-out infinite;
+          }
+        `}</style>
         <div className="relative z-10 grid grid-cols-4 gap-2">
           {/* Vaccine */}
-          <div className="bg-white/10 rounded-2xl p-2.5 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
+          <div className={`bg-white/10 rounded-2xl p-2.5 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden transition-all ${vaxTile.isOverdue ? 'overdue-border' : 'border border-white/10'}`}>
             {vaxTile.isDue && <div className="absolute inset-0 rounded-2xl border border-yellow-300 animate-pulse pointer-events-none" />}
-            {vaxTile.isOverdue && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
-            <Syringe className="mb-1 text-green-200" size={18} />
+            <Syringe className={`mb-1 ${vaxTile.isOverdue ? 'text-red-400' : 'text-green-200'}`} size={18} />
             <span className={`text-sm font-bold leading-tight ${vaxTile.isOverdue ? 'text-red-300' : vaxTile.isDue ? 'text-yellow-300' : 'text-white'}`}>{vaxTile.value}</span>
-            <span className="text-[9px] text-green-100 opacity-80 leading-none mt-0.5">{vaxTile.label}</span>
+            <span className={`text-[9px] leading-none mt-0.5 ${vaxTile.isOverdue ? 'text-red-200' : 'text-green-100 opacity-80'}`}>{vaxTile.label}</span>
           </div>
 
           {/* Weighing */}
-          <div className="bg-white/10 rounded-2xl p-2.5 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
+          <div className={`bg-white/10 rounded-2xl p-2.5 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden transition-all ${growthTile.isOverdue ? 'overdue-border' : 'border border-white/10'}`}>
             {growthTile.isDue && <div className="absolute inset-0 rounded-2xl border border-yellow-300 animate-pulse pointer-events-none" />}
-            {growthTile.isOverdue && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
-            <Activity className="mb-1 text-yellow-200" size={18} />
+            <Activity className={`mb-1 ${growthTile.isOverdue ? 'text-red-400' : 'text-yellow-200'}`} size={18} />
             <span className={`text-sm font-bold leading-tight ${growthTile.isOverdue ? 'text-red-300' : growthTile.isDue ? 'text-yellow-300' : 'text-yellow-400'}`}>{growthTile.value}</span>
-            <span className="text-[9px] text-yellow-100 opacity-80 leading-none mt-0.5">{growthTile.label}</span>
+            <span className={`text-[9px] leading-none mt-0.5 ${growthTile.isOverdue ? 'text-red-200' : 'text-yellow-100 opacity-80'}`}>{growthTile.label}</span>
           </div>
 
           {/* Vitamin A */}
-          <div className="bg-white/10 rounded-2xl p-2.5 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
+          <div className={`bg-white/10 rounded-2xl p-2.5 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden transition-all ${vitATile.isOverdue ? 'overdue-border' : 'border border-white/10'}`}>
             {vitATile.isDue && <div className="absolute inset-0 rounded-2xl border border-yellow-300 animate-pulse pointer-events-none" />}
-            {vitATile.isOverdue && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
-            <TestTube className="mb-1 text-blue-200" size={18} />
+            <TestTube className={`mb-1 ${vitATile.isOverdue ? 'text-red-400' : 'text-blue-200'}`} size={18} />
             <span className={`text-sm font-bold leading-tight ${vitATile.isOverdue ? 'text-red-300' : vitATile.isDue ? 'text-yellow-300' : 'text-white'}`}>{vitATile.value}</span>
-            <span className="text-[9px] text-blue-100 opacity-80 leading-none mt-0.5">{vitATile.label}</span>
+            <span className={`text-[9px] leading-none mt-0.5 ${vitATile.isOverdue ? 'text-red-200' : 'text-blue-100 opacity-80'}`}>{vitATile.label}</span>
           </div>
 
         {/* Deworming */}
-          <div className="bg-white/10 rounded-2xl p-2.5 border border-white/10 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden">
+          <div className={`bg-white/10 rounded-2xl p-2.5 backdrop-blur-sm flex flex-col items-center text-center relative overflow-hidden transition-all ${dewormingTile.isOverdue ? 'overdue-border' : 'border border-white/10'}`}>
             {dewormingTile.isDue && <div className="absolute inset-0 rounded-2xl border border-yellow-300 animate-pulse pointer-events-none" />}
-            {dewormingTile.isOverdue && <div className="absolute top-0 w-full h-1 bg-red-400 animate-pulse" />}
-            <Pill className="mb-1 text-purple-200" size={18} />
+            <Pill className={`mb-1 ${dewormingTile.isOverdue ? 'text-red-400' : 'text-purple-200'}`} size={18} />
             <span className={`text-sm font-bold leading-tight ${dewormingTile.isOverdue ? 'text-red-300' : dewormingTile.isDue ? 'text-yellow-300' : 'text-white'}`}>{dewormingTile.value}</span>
-            <span className="text-[9px] text-purple-100 opacity-80 leading-none mt-0.5">{dewormingTile.label}</span>
+            <span className={`text-[9px] leading-none mt-0.5 ${dewormingTile.isOverdue ? 'text-red-200' : 'text-purple-100 opacity-80'}`}>{dewormingTile.label}</span>
           </div>
         </div>
       </div>
@@ -686,12 +694,29 @@ export default function KidsDashboard() {
 
       <hr className="border-gray-200" />
 
+      <div className="flex items-center justify-between gap-3" role="tablist" aria-label="Health records view">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={healthView === "active"}
+          onClick={() => setHealthView("active")}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold transition ${healthView === "active" ? 'bg-[#027027] text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
+        >
+          Active Checklist ({summary?.dueForms?.length || 0})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={healthView === "history"}
+          onClick={() => setHealthView("history")}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold transition ${healthView === "history" ? 'bg-[#027027] text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
+        >
+          Complete History ({summary?.history?.length || 0})
+        </button>
+      </div>
+
       {/* Due Action Forms */}
-      <div>
-        <h2 className="text-[#027027] text-sm font-bold mb-3 flex items-center gap-1">
-          🔔 Active Checklist ({summary?.dueForms?.length || 0})
-        </h2>
-        
+      <div className={healthView === "active" ? "" : "hidden"}>
         {summary?.dueForms && summary.dueForms.length > 0 ? (
           <div className="space-y-3">
             {summary.dueForms.map((act) => {
@@ -712,8 +737,8 @@ export default function KidsDashboard() {
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => openForm(act)} className="bg-[#027027] text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm">
-                    {isOverdue ? "Overdue" : "Record"}
+                  <button onClick={() => openForm(act)} className={`text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm ${isOverdue ? 'bg-red-600 text-white animate-pulse' : 'bg-[#027027] text-white'}`}>
+                    {isOverdue ? "Resolve Now" : "Record"}
                   </button>
                 </div>
               );
@@ -728,7 +753,7 @@ export default function KidsDashboard() {
 
       {/* Late Registration Section */}
       {summary?.pastUnrecorded && summary.pastUnrecorded.length > 0 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-[20px] p-5 shadow-sm">
+        <div className={`${healthView === "active" ? "" : "hidden"} bg-orange-50 border border-orange-200 rounded-[20px] p-5 shadow-sm`}>
           <div className="flex gap-3">
             <AlertCircle size={22} className="text-orange-600 flex-shrink-0" />
             <div>
@@ -752,11 +777,7 @@ export default function KidsDashboard() {
       )}
 
       {/* Health History */}
-      <div>
-        <h2 className="text-[#027027] text-sm font-bold mb-3 flex items-center gap-1.5">
-          <History size={16} /> Complete Health History ({summary?.history?.length || 0})
-        </h2>
-
+      <div className={healthView === "history" ? "" : "hidden"}>
         {summary?.history && summary.history.length > 0 ? (
           <div className="space-y-3">
             {summary.history.map((rec, index) => (
@@ -778,7 +799,7 @@ export default function KidsDashboard() {
                   </span>
                 </div>
                 
-                <button onClick={() => deleteHistoryRecord(rec)} className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition active:scale-95 p-1">
+                <button onClick={() => deleteHistoryRecord(rec)} className="absolute top-9 right-4 text-gray-300 hover:text-gray-500 transition active:scale-95 p-1">
                   <Trash2 size={16} />
                 </button>
 

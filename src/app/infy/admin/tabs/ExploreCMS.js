@@ -43,6 +43,10 @@ export default function ExploreCMS() {
       { title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
       { title: "Sleep and Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
       { title: "Safety and First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
+      { title: "Hygiene and Care", icon: "🧼", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "YfhWxMmBIW4" }, { id: "c7Yr3KNnujs" }] },
+      { title: "Learning and Play", icon: "🧩", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-emerald-50 border-emerald-200", iconBg: "bg-emerald-100", videos: [{ id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+      { title: "Parenting", icon: "👨‍👩‍👧", image: "/images/thumbnails/Parenting.jpeg", color: "bg-fuchsia-50 border-fuchsia-200", iconBg: "bg-fuchsia-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }] },
+      { title: "Special Needs", icon: "🤝", image: "/images/thumbnails/special needs and support.jpeg", color: "bg-cyan-50 border-cyan-200", iconBg: "bg-cyan-100", videos: [{ id: "upcanlY0oNM" }, { id: "LRdoBofFcNs" }] },
     ];
     setLoading(true);
     let saved = 0;
@@ -97,11 +101,9 @@ export default function ExploreCMS() {
           <h2 className="text-xl font-black" style={{ color: '#014d1a' }}>Explore Content</h2>
           <p className="text-sm mt-1" style={{ color: '#4caf50' }}>Manage video categories shown in the Explore tab.</p>
         </div>
-        {categories.length === 0 && (
-          <button onClick={handleInitDefaults} className="text-white font-bold py-2 px-4 rounded-xl" style={{ background: '#027027' }}>
-            Initialize Default Data
-          </button>
-        )}
+        <button onClick={handleInitDefaults} className="text-white font-bold py-2 px-4 rounded-xl" style={{ background: '#027027' }}>
+          Initialize Default Data
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -223,7 +223,8 @@ export default function LearnMorePage() {
                 shortDescription: doc.data().description || newData[key].shortDescription,
                 fullDescription: doc.data().fullDescription || newData[key].fullDescription,
                 titleOverride: doc.data().title || null,
-                linkOverride: doc.data().link || null,
+                videos: doc.data().videos && doc.data().videos.length > 0 ? doc.data().videos : newData[key].videos,
+                sections: Array.isArray(doc.data().sections) ? doc.data().sections : newData[key].sections,
               };
             }
           });

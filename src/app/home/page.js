@@ -4,27 +4,41 @@ import { CalendarCheck, Activity, Footprints, Grid, ChevronRight, Syringe, Baby 
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useEffect } from "react";
 import { useChildren } from "@/hooks/useChildren";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
+
+const FALLBACK_TIPS = [
+  { title: "Tummy Time", desc: "Start tummy time early. Even 3–5 minutes a day helps strengthen neck and shoulder muscles.", link: "https://raisingchildren.net.au/newborns/play-learning/play-ideas/tummy-time" },
+  { title: "Sleep Routine", desc: "Establish a consistent bedtime routine. Bath, book, and bed can work wonders.", link: "https://raisingchildren.net.au/newborns/sleep/settling-routines/newborn-sleep-routines" },
+  { title: "Nutritional Needs", desc: "Breastmilk or formula provides all the nutrients a child needs for the first 6 months.", link: "https://www.who.int/news-room/fact-sheets/detail/infant-and-young-child-feeding" },
+  { title: "Language Skills", desc: "Talk, read, and sing to your baby constantly to build their vocabulary.", link: "https://raisingchildren.net.au/babies/development/language-development/language-3-12-months" },
+  { title: "Vaccination", desc: "Keep track of scheduled immunizations. They are critical for your baby's immune defense.", link: "https://www.cdc.gov/vaccines/by-age/index.html" },
+  { title: "Motor Skills", desc: "Provide safe objects to grasp to improve hand-eye coordination.", link: "https://www.unicef.org/parenting/child-development/baby-milestones-your-child-active-play" },
+  { title: "Teething Relief", desc: "A cold teething ring can soothe sore gums when those first teeth emerge.", link: "https://www.texaschildrens.org/content/wellness/teething-tips-new-information-parents" },
+  { title: "Solid Foods", desc: "Introduce solids one at a time to monitor for any potential allergies.", link: "https://www.nhs.uk/baby/weaning-and-feeding/babys-first-solid-foods/" },
+  { title: "Baby Proofing", desc: "Cover sharp edges and secure cabinets before your baby starts crawling.", link: "https://www.unicef.org/parenting/safety/how-to-babyproof-your-home" },
+  { title: "Self Care", desc: "Don't forget to take care of yourself. A rested parent is a happy parent!", link: "https://www.unicef.org/parenting/mental-health/parent-self-care-tips" },
+];
 
 export default function Home() {
   const { kids } = useChildren();
   const [activeKidIndex, setActiveKidIndex] = useState(0);
+  const [tips, setTips] = useState(FALLBACK_TIPS);
 
   const nextKid = () => setActiveKidIndex((prev) => (prev + 1) % kids.length);
   const activeKid = kids.length > 0 ? kids[activeKidIndex] : null;
 
-  const tips = [
-    { title: "Tummy Time", desc: "Start tummy time early. Even 3–5 minutes a day helps strengthen neck and shoulder muscles.", link: "https://raisingchildren.net.au/newborns/play-learning/play-ideas/tummy-time" },
-    { title: "Sleep Routine", desc: "Establish a consistent bedtime routine. Bath, book, and bed can work wonders.", link: "https://raisingchildren.net.au/newborns/sleep/settling-routines/newborn-sleep-routines" },
-    { title: "Nutritional Needs", desc: "Breastmilk or formula provides all the nutrients a child needs for the first 6 months.", link: "https://www.who.int/news-room/fact-sheets/detail/infant-and-young-child-feeding" },
-    { title: "Language Skills", desc: "Talk, read, and sing to your baby constantly to build their vocabulary.", link: "https://raisingchildren.net.au/babies/development/language-development/language-3-12-months" },
-    { title: "Vaccination", desc: "Keep track of scheduled immunizations. They are critical for your baby's immune defense.", link: "https://www.cdc.gov/vaccines/by-age/index.html" },
-    { title: "Motor Skills", desc: "Provide safe objects to grasp to improve hand-eye coordination.", link: "https://www.unicef.org/parenting/child-development/baby-milestones-your-child-active-play" },
-    { title: "Teething Relief", desc: "A cold teething ring can soothe sore gums when those first teeth emerge.", link: "https://www.texaschildrens.org/content/wellness/teething-tips-new-information-parents" },
-    { title: "Solid Foods", desc: "Introduce solids one at a time to monitor for any potential allergies.", link: "https://www.nhs.uk/baby/weaning-and-feeding/babys-first-solid-foods/" },
-    { title: "Baby Proofing", desc: "Cover sharp edges and secure cabinets before your baby starts crawling.", link: "https://www.unicef.org/parenting/safety/how-to-babyproof-your-home" },
-    { title: "Self Care", desc: "Don't forget to take care of yourself. A rested parent is a happy parent!", link: "https://www.unicef.org/parenting/mental-health/parent-self-care-tips" },
-  ];
+  useEffect(() => {
+    getDocs(collection(db, "content_carousel"))
+      .then((snap) => {
+        const remoteTips = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+        remoteTips.sort((a, b) => (a.order || 0) - (b.order || 0));
+        if (remoteTips.length > 0) setTips(remoteTips);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-500 min-h-screen pb-safe">

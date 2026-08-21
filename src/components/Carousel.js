@@ -73,6 +73,7 @@ export default function Carousel({ tips }) {
             onClick={() => tip.link && window.open(tip.link, "_blank")}
             className={`flex-shrink-0 snap-center rounded-3xl ${cardColors[i % cardColors.length]} h-36 shadow-xl relative flex flex-col justify-center p-5 text-white overflow-hidden cursor-pointer`}
             style={{
+              ...(tip.color ? { backgroundColor: tip.color } : {}),
               width: "82%",
               marginLeft: i === 0 ? "9%" : "0",
               marginRight: i === loopedTips.length - 1 ? "9%" : "0",

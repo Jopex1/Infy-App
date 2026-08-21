@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
-const PLACEHOLDER = (slot) => ({ id: `PLACEHOLDER_${slot}`, placeholder: true });
-
 // Fallback hardcoded categories in case Firestore is empty or inaccessible
 const FALLBACK_CATEGORIES = [
   { id: "cat_0", order: 0, title: "Nutrition", icon: "🥗", image: "/images/thumbnails/nutrition.jpg.jpeg", color: "bg-orange-50 border-orange-200", iconBg: "bg-orange-100", videos: [{ id: "__Uc8HVve2A" }, { id: "c7Yr3KNnujs" }, { id: "SA_9qmMOR3U" }] },
@@ -17,6 +15,10 @@ const FALLBACK_CATEGORIES = [
   { id: "cat_5", order: 5, title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
   { id: "cat_6", order: 6, title: "Sleep & Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
   { id: "cat_7", order: 7, title: "Safety & First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
+  { id: "cat_8", order: 8, title: "Hygiene & Care", icon: "🧼", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "YfhWxMmBIW4" }, { id: "c7Yr3KNnujs" }] },
+  { id: "cat_9", order: 9, title: "Learning & Play", icon: "🧩", image: "/images/thumbnails/Learning And Play.jpeg", color: "bg-emerald-50 border-emerald-200", iconBg: "bg-emerald-100", videos: [{ id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
+  { id: "cat_10", order: 10, title: "Parenting", icon: "👨‍👩‍👧", image: "/images/thumbnails/Parenting.jpeg", color: "bg-fuchsia-50 border-fuchsia-200", iconBg: "bg-fuchsia-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }] },
+  { id: "cat_11", order: 11, title: "Special Needs", icon: "🤝", image: "/images/thumbnails/special needs and support.jpeg", color: "bg-cyan-50 border-cyan-200", iconBg: "bg-cyan-100", videos: [{ id: "upcanlY0oNM" }, { id: "LRdoBofFcNs" }] },
 ];
 
 export default function ExplorePage() {

@@ -10,6 +10,7 @@ import Image from "next/image";
 import AdminsTab from "./tabs/AdminsTab";
 import OverviewTab from "./tabs/OverviewTab";
 import ExploreCMS from "./tabs/ExploreCMS";
+import CarouselCMS from "./tabs/CarouselCMS";
 import LearnMoreCMS from "./tabs/LearnMoreCMS";
 import SupportTickets from "./tabs/SupportTickets";
 import UsersTab from "./tabs/UsersTab";
@@ -76,6 +77,7 @@ export default function AdminDashboard() {
           <NavItem active={activeTab === "users"} onClick={() => setActiveTab("users")} icon={<Users size={20}/>} label="Users & Professionals" />
           <NavItem active={activeTab === "support"} onClick={() => setActiveTab("support")} icon={<MessageSquare size={20}/>} label="Support Tickets" />
           <NavItem active={activeTab === "explore_cms"} onClick={() => setActiveTab("explore_cms")} icon={<Video size={20}/>} label="Explore Videos" />
+          <NavItem active={activeTab === "carousel_cms"} onClick={() => setActiveTab("carousel_cms")} icon={<Forward size={20}/>} label="Home Carousel" />
           <NavItem active={activeTab === "learn_more_cms"} onClick={() => setActiveTab("learn_more_cms")} icon={<FileText size={20}/>} label="Learn More" />
           {isSuper && <NavItem active={activeTab === "admins"} onClick={() => setActiveTab("admins")} icon={<ShieldAlert size={20}/>} label="Manage Admins" />}
         </nav>
@@ -105,6 +107,7 @@ export default function AdminDashboard() {
             <option value="users">Users & Professionals</option>
             <option value="support">Support Tickets</option>
             <option value="explore_cms">Explore Videos</option>
+            <option value="carousel_cms">Home Carousel</option>
             <option value="learn_more_cms">Learn More</option>
             {isSuper && <option value="admins">Manage Admins</option>}
           </select>
@@ -118,6 +121,7 @@ export default function AdminDashboard() {
           {activeTab === "users" && <UsersTab />}
           {activeTab === "support" && <SupportTickets adminUser={adminUser} />}
           {activeTab === "explore_cms" && <ExploreCMS />}
+          {activeTab === "carousel_cms" && <CarouselCMS />}
           {activeTab === "learn_more_cms" && <LearnMoreCMS />}
           {activeTab === "admins" && isSuper && <AdminsTab />}
         </div>
