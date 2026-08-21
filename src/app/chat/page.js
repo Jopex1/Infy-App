@@ -275,9 +275,6 @@ export default function ChatPage() {
           
           {activeTab === "ai" && (
             <div className="flex items-center">
-              <button onClick={() => { if(confirm("Clear current conversation?")) startNewChat(); }} className="text-gray-400 p-2.5 ml-1 active:scale-95 transition" title="Clear">
-                <Trash2 size={20} />
-              </button>
               <button onClick={() => setShowHistory(true)} className="text-[#027027] p-2.5 ml-1 active:scale-95 transition" title="History">
                 <Clock size={20} />
               </button>

@@ -459,14 +459,26 @@ export default function KidsDashboard() {
         <div className="p-4 pb-safe animate-in fade-in duration-300">
           <h2 className="text-xl font-bold text-[#027027] mb-4 text-center mt-4">Add Your First Child</h2>
           <form onSubmit={handleAdd} className="bg-white rounded-3xl p-5 shadow-xl border border-gray-100 flex flex-col gap-3">
-            <div className="flex justify-center mb-2">
-              <button type="button" onClick={() => fileRef.current.click()} className="relative">
-                <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-                  {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <img src="/images/newchildicon.png" alt="Add Child" className="w-12 h-12 object-contain" />}
-                </div>
-              </button>
+            <div className="flex justify-center mb-4">
+              {newKid.avatarPreview ? (
+                <button type="button" onClick={() => fileRef.current.click()} className="relative">
+                  <div className="w-24 h-24 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
+                    <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" />
+                  </div>
+                </button>
+              ) : (
+                <button type="button" onClick={() => fileRef.current.click()} className="flex flex-col items-center gap-1">
+                  <img
+                    src="/images/newchildicon.png"
+                    alt="Add Child"
+                    style={{ width: 120, height: 120, objectFit: 'contain', animation: 'swingLR 3s ease-in-out infinite' }}
+                  />
+                  <span className="text-[10px] font-bold text-[#027027]/60 uppercase tracking-wide">Tap to add photo</span>
+                </button>
+              )}
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
             </div>
+            <style>{`@keyframes swingLR { 0%,100%{transform:translateX(-8px)} 50%{transform:translateX(8px)} }`}</style>
 
             <div>
               <label className="text-xs font-bold text-gray-400 uppercase mb-0.5 block">Full Name</label>
@@ -515,8 +527,14 @@ export default function KidsDashboard() {
     }
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-8">
-        <img src="/images/newchildicon.png" alt="Child" className="w-24 h-24 mx-auto mb-4 object-contain" />
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-8">
+        <style>{`@keyframes swingLR { 0%,100%{transform:translateX(-10px)} 50%{transform:translateX(10px)} }`}</style>
+        <img
+          src="/images/newchildicon.png"
+          alt="Child"
+          style={{ width: 180, height: 180, objectFit: 'contain', animation: 'swingLR 3s ease-in-out infinite' }}
+          className="mx-auto mb-6"
+        />
         <h2 className="text-xl font-bold text-gray-700 mb-2">No child added yet</h2>
         <p className="text-gray-500 text-sm mb-6">Add your first child to get started.</p>
         <button onClick={() => setIsAdding(true)} className="bg-green-50 border border-[#027027] text-[#027027] font-bold py-3 px-8 rounded-full shadow-sm hover:bg-green-100 transition active:scale-95">
@@ -812,12 +830,23 @@ export default function KidsDashboard() {
               <button onClick={() => setIsAdding(false)} className="text-gray-400 bg-gray-100 rounded-full p-1.5"><X size={18}/></button>
             </div>
             <form onSubmit={handleAdd} className="flex flex-col gap-3">
-              <div className="flex justify-center mb-2">
-                <button type="button" onClick={() => fileRef.current.click()} className="relative">
-                  <div className="w-20 h-20 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
-                    {newKid.avatarPreview ? <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" /> : <img src="/images/newchildicon.png" alt="Add Child" className="w-12 h-12 object-contain" />}
-                  </div>
-                </button>
+              <div className="flex justify-center mb-4">
+                {newKid.avatarPreview ? (
+                  <button type="button" onClick={() => fileRef.current.click()} className="relative">
+                    <div className="w-24 h-24 rounded-full bg-green-50 border-2 border-[#027027] overflow-hidden flex items-center justify-center shadow-sm">
+                      <img src={newKid.avatarPreview} className="w-full h-full object-cover" alt="avatar" />
+                    </div>
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => fileRef.current.click()} className="flex flex-col items-center gap-1">
+                    <img
+                      src="/images/newchildicon.png"
+                      alt="Add Child"
+                      style={{ width: 120, height: 120, objectFit: 'contain', animation: 'swingLR 3s ease-in-out infinite' }}
+                    />
+                    <span className="text-[10px] font-bold text-[#027027]/60 uppercase tracking-wide">Tap to add photo</span>
+                  </button>
+                )}
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
               </div>
               <div>
