@@ -26,14 +26,10 @@ export default function EditChildPage() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setSaving(true);
-    try {
-      await updateChild(id, kid, avatarFile);
-      setSaving(false);
-      router.replace("/profile");
-    } catch (err) {
-      setSaving(false);
+    updateChild(id, kid, avatarFile).catch(() => {
       alert("Failed to save. Please try again.");
-    }
+    });
+    router.replace("/profile");
   };
 
   const handleDelete = async () => {

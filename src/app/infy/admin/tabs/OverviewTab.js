@@ -24,17 +24,18 @@ export default function OverviewTab() {
         const childrenSnap = childrenResult.status === "fulfilled" ? childrenResult.value : null;
         const ticketsSnap = ticketsResult.status === "fulfilled" ? ticketsResult.value : null;
         const analyticsSnap = analyticsResult.status === "fulfilled" ? analyticsResult.value : null;
-        const activeUsers = activeUsersResult.status === "fulfilled" ? activeUsersResult.value.filter((user) => {
+        const authUsers = activeUsersResult.status === "fulfilled" ? activeUsersResult.value : [];
+        const activeUsers = authUsers.filter((user) => {
           const lastSignIn = Date.parse(user.lastSignIn || "");
           return Number.isFinite(lastSignIn) && Date.now() - lastSignIn < 30 * 24 * 60 * 60 * 1000;
-        }).length : 0;
+        }).length;
         let totalVisits = 0, todayVisits = 0;
         const today = new Date().toISOString().split('T')[0];
         analyticsSnap?.forEach(doc => {
           totalVisits += (doc.data().visitors || 0);
           if (doc.id === today) todayVisits = doc.data().visitors || 0;
         });
-        setStats({ users: usersSnap?.size || 0, activeUsers, children: childrenSnap?.size || 0, visitorsToday: todayVisits, visitorsTotal: totalVisits, tickets: ticketsSnap?.size || 0 });
+        setStats({ users: authUsers.length || usersSnap?.size || 0, activeUsers, children: childrenSnap?.size || 0, visitorsToday: todayVisits, visitorsTotal: totalVisits, tickets: ticketsSnap?.size || 0 });
       } catch (err) { console.error(err); }
       setLoading(false);
     };
@@ -54,6 +55,7 @@ export default function OverviewTab() {
         <StatCard title="Today's Visitors" value={stats.visitorsToday} icon={<TrendingUp size={22} />} color="#027027" bg="#e8f5e9" />
         <StatCard title="Total Visitors" value={stats.visitorsTotal} icon={<BarChart3 size={22} />} color="#027027" bg="#f0f7f0" />
         <StatCard title="Active Users (30d)" value={stats.activeUsers} icon={<Activity size={22} />} color="#027027" bg="#e8f5e9" />
+        <StatCard title="App Users" value={stats.users} icon={<Users size={22} />} color="#014d1a" bg="#c8e6c9" />
         <StatCard title="Total Children" value={stats.children} icon={<Users size={22} />} color="#014d1a" bg="#c8e6c9" />
         <StatCard title="Support Tickets" value={stats.tickets} icon={<MessageCircle size={22} />} color="#027027" bg="#e8f5e9" />
       </div>
