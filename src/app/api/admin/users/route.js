@@ -18,7 +18,13 @@ export async function GET() {
     }));
     return NextResponse.json({ users, total: users.length });
   } catch (err) {
-    console.error("Admin list users error:", err);
+    console.error("Admin list users error:", {
+      message: err.message,
+      hasProjectId: Boolean(process.env.FIREBASE_ADMIN_PROJECT_ID),
+      hasClientEmail: Boolean(process.env.FIREBASE_ADMIN_CLIENT_EMAIL),
+      hasPrivateKey: Boolean(process.env.FIREBASE_ADMIN_PRIVATE_KEY),
+      hasServiceAccountJson: Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_JSON),
+    });
     return NextResponse.json({ error: `Unable to load users: ${err.message}` }, { status: 500 });
   }
 }
