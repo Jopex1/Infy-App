@@ -1,6 +1,8 @@
 import { getAdminAuth } from "@/lib/firebaseAdmin";
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 export async function GET() {
   try {
     const adminAuth = getAdminAuth();
@@ -17,7 +19,7 @@ export async function GET() {
     return NextResponse.json({ users, total: users.length });
   } catch (err) {
     console.error("Admin list users error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: `Unable to load users: ${err.message}` }, { status: 500 });
   }
 }
 
