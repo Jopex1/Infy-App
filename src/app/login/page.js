@@ -6,7 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import PageHeader from "@/components/PageHeader";
 import { normalizePhoneNumber } from "@/lib/phoneHelper";
-import { auth, signInWithEmailAndPassword, signInWithPopup, signOut, googleProvider } from "@/lib/firebase";
+import { auth, db, signInWithEmailAndPassword, signInWithPopup, signOut, googleProvider } from "@/lib/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 export default function Login() {
   const router = useRouter();
@@ -19,7 +20,15 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, form.identifier, form.password);
+      let email = form.identifier;
+      if (mode === "phone") {
+        const phoneRes = normalizePhoneNumber(form.identifier, "GH");
+        if (!phoneRes.isValid) throw new Error(phoneRes.error);
+        const phoneSnapshot = await getDocs(query(collection(db, "users"), where("phone", "==", phoneRes.normalized)));
+        if (phoneSnapshot.empty) throw new Error("No account was found for this phone number.");
+        email = phoneSnapshot.docs[0].data().email;
+      }
+      const userCredential = await signInWithEmailAndPassword(auth, email, form.password);
       const user = userCredential.user;
       const existing = JSON.parse(localStorage.getItem("infy_notifications") || "[]");
       localStorage.setItem("infy_notifications", JSON.stringify([{

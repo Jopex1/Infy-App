@@ -53,6 +53,49 @@ body {
 .dark .bg-rose-100 { background-color: #4d0e1e !important; color: #fda4af !important; }
 .dark .bg-red-100 { background-color: #4a0d0d !important; color: #fca5a5 !important; }
 
+.dark .checklist-overdue-card {
+  background-color: #4a0d0d !important;
+  border-color: #ef4444 !important;
+}
+
+.dark .checklist-overdue-card .checklist-title,
+.dark .checklist-overdue-card .checklist-date {
+  color: #ffffff !important;
+}
+
+.dark .checklist-overdue-card .checklist-title,
+.dark .checklist-overdue-card .checklist-date,
+.dark .action-checklist-card h3,
+.dark .action-checklist-card p {
+  color: #ffffff !important;
+}
+
+.dark .action-checklist-card {
+  background-color: #4a0d0d !important;
+  border-color: #ef4444 !important;
+}
+
+.dark .late-records-card {
+  background-color: #3a1c05 !important;
+  border-color: #b45309 !important;
+}
+
+.dark .late-records-card .late-records-title,
+.dark .late-records-card .late-records-description,
+.dark .late-records-card .late-records-row,
+.dark .late-records-card .late-records-row span {
+  color: #ffffff !important;
+}
+
+.dark .late-records-card .late-records-row {
+  background-color: #522707 !important;
+  border-color: #d97706 !important;
+}
+
+.dark .late-records-card * {
+  color: #ffffff !important;
+}
+
 .dark .text-gray-900, .dark .text-gray-800, .dark .text-gray-700 { color: #f1f1f1 !important; }
 .dark .text-gray-600, .dark .text-gray-500, .dark .text-gray-400 { color: #9ca3af !important; }
 .dark .text-\[\#027027\] { color: #4ade80 !important; }

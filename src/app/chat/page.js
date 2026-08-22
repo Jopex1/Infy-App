@@ -66,12 +66,19 @@ export default function ChatPage() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) setSessions(JSON.parse(stored));
 
+    const refreshSessions = () => {
+      const latest = localStorage.getItem(STORAGE_KEY);
+      if (latest) setSessions(JSON.parse(latest));
+    };
+    window.addEventListener("storage", refreshSessions);
+
     const videoData = localStorage.getItem("infy_ai_video");
     if (videoData) {
       const video = JSON.parse(videoData);
       localStorage.removeItem("infy_ai_video");
       pendingVideoRef.current = video;
     }
+    return () => window.removeEventListener("storage", refreshSessions);
   }, []);
 
   useEffect(() => {
@@ -419,7 +426,7 @@ export default function ChatPage() {
           </div>
         </>
       ) : (
-        <div className="flex-1 overflow-y-auto overscroll-y-contain p-6 space-y-6 pb-[100px] relative z-10" style={{ paddingTop: '152px' }}>
+        <div className="flex-1 overflow-y-auto overscroll-y-contain p-6 space-y-6 pb-[100px] relative z-10" style={{ paddingTop: '152px', paddingBottom: `calc(100px + ${keyboardOffset}px)` }}>
           <div className="bg-[#027027]/5 border border-[#027027]/10 rounded-3xl p-5 shadow-sm space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center text-[#027027] shrink-0">
@@ -450,6 +457,7 @@ export default function ChatPage() {
                 message,
                 type: "health",
                 userEmail,
+                userId: auth?.currentUser?.uid || null,
                 status: "pending",
                 createdAt: new Date().toISOString()
               });
@@ -465,12 +473,12 @@ export default function ChatPage() {
           }} className="space-y-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Subject</label>
-              <input required name="subject" type="text" placeholder="e.g., Baby's teething fever help"
+              <input required name="subject" type="text" placeholder="e.g., Baby's teething fever help" onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
                 className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#027027] text-sm text-gray-800" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Your Message</label>
-              <textarea required name="message" rows={6} placeholder="Describe your baby's symptoms or questions in detail..."
+              <textarea required name="message" rows={6} placeholder="Describe your baby's symptoms or questions in detail..." onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center", behavior: "smooth" })}
                 className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#027027] text-sm text-gray-800 resize-none" />
             </div>
             <button type="submit" className="w-full bg-[#027027] text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition disabled:opacity-50">

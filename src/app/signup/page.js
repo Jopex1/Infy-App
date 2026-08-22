@@ -8,7 +8,8 @@ import PageHeader from "@/components/PageHeader";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { normalizePhoneNumber } from "@/lib/phoneHelper";
-import { auth, createUserWithEmailAndPassword, signInWithPopup, googleProvider } from "@/lib/firebase";
+import { auth, db, createUserWithEmailAndPassword, signInWithPopup, googleProvider } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function SignUp() {
   const router = useRouter();
@@ -32,7 +33,7 @@ export default function SignUp() {
     if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
     
     const phoneRes = normalizePhoneNumber(phone, "GH");
-    if (!phoneRes.isValid) {
+    if (phone && !phoneRes.isValid) {
       setError(phoneRes.error);
       return;
     }
@@ -40,6 +41,14 @@ export default function SignUp() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const user = userCredential.user;
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        phone: phoneRes.normalized,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
       
       localStorage.setItem("infy_user", JSON.stringify({ 
         uid: user.uid,
@@ -58,7 +67,7 @@ export default function SignUp() {
         const notif = {
           id: `signup_${user.uid}`,
           title: `Welcome to Infy, ${form.firstName}!`,
-          body: "Your account has been created. Start tracking your child's growth today.",
+          desc: "Your account has been created. Start tracking your child's growth today.",
           time: "Just now", timestamp: Date.now(),
           unread: true,
           type: "signup"
@@ -95,7 +104,7 @@ export default function SignUp() {
         const notif = {
           id: `signup_${user.uid}`,
           title: `Welcome to Infy, ${user.displayName?.split(' ')[0] || 'there'}!`,
-          body: "Your account has been created. Start tracking your child's growth today.",
+          desc: "Your account has been created. Start tracking your child's growth today.",
           time: "Just now", timestamp: Date.now(),
           unread: true,
           type: "signup"

@@ -7,6 +7,23 @@ import { Home, Baby, Bell, CircleUserRound, MessageSquareText } from "lucide-rea
 export default function BottomNav() {
   const pathname = usePathname();
   const [notifCount, setNotifCount] = useState(0);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const updateKeyboardState = () => {
+      const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardOpen(keyboardHeight > 120);
+    };
+    updateKeyboardState();
+    viewport.addEventListener('resize', updateKeyboardState);
+    viewport.addEventListener('scroll', updateKeyboardState);
+    return () => {
+      viewport.removeEventListener('resize', updateKeyboardState);
+      viewport.removeEventListener('scroll', updateKeyboardState);
+    };
+  }, []);
 
   useEffect(() => {
     const check = () => {
@@ -23,7 +40,7 @@ export default function BottomNav() {
     };
   }, []);
 
-  if (['/onboarding', '/login', '/signup'].includes(pathname)) return null;
+  if (['/onboarding', '/login', '/signup'].includes(pathname) || keyboardOpen) return null;
 
   const navItems = [
     { path: '/home', icon: Home, label: 'Home' },

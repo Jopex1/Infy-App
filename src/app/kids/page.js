@@ -57,6 +57,7 @@ export default function KidsDashboard() {
   const fileRef = useRef();
 
   useEffect(() => {
+    if (!auth) return undefined;
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);
@@ -700,7 +701,7 @@ export default function KidsDashboard() {
           role="tab"
           aria-selected={healthView === "active"}
           onClick={() => setHealthView("active")}
-          className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold transition ${healthView === "active" ? 'bg-[#027027] text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
+          className={`flex-1 rounded-xl px-4 py-2.5 text-xs font-bold transition ${healthView === "active" ? 'bg-[#027027] text-white dark:text-white shadow-sm' : 'bg-gray-100 text-gray-500'}`}
         >
           Active Checklist ({summary?.dueForms?.length || 0})
         </button>
@@ -722,17 +723,17 @@ export default function KidsDashboard() {
             {summary.dueForms.map((act) => {
               const isOverdue = act.status === "OVERDUE";
               return (
-                <div key={act.scheduleId} className={`border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${isOverdue ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
+                <div key={act.scheduleId} className={`checklist-overdue-card border rounded-2xl p-4 flex justify-between items-center shadow-sm transition ${isOverdue ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'}`}>
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-green-100 text-[#027027]'}`}>
+                    <div className={`p-2 rounded-full ${isOverdue ? 'bg-red-100 text-red-600 dark:bg-red-100 dark:text-red-600' : 'bg-green-100 text-[#027027]'}`}>
                       {act.activityType === "VACCINATION" && <Syringe size={18} />}
                       {act.activityType === "GROWTH_MONITORING" && <Activity size={18} />}
                       {act.activityType === "VITAMIN_A" && <TestTube size={18} />}
                       {act.activityType === "DEWORMING" && <Pill size={18} />}
                     </div>
                     <div>
-                      <span className={`text-sm font-bold ${isOverdue ? 'text-red-900' : 'text-[#027027]'}`}>{act.title}</span>
-                      <span className="block text-[10px] text-gray-500 mt-0.5">
+                      <span className={`checklist-title text-sm font-bold ${isOverdue ? 'text-red-900' : 'text-[#027027]'}`}>{act.title}</span>
+                      <span className="checklist-date block text-[10px] text-gray-500 mt-0.5">
                         Due: {act.nextDueDate || act.scheduledDate}
                       </span>
                     </div>
@@ -753,17 +754,17 @@ export default function KidsDashboard() {
 
       {/* Late Registration Section */}
       {summary?.pastUnrecorded && summary.pastUnrecorded.length > 0 && (
-        <div className={`${healthView === "active" ? "" : "hidden"} bg-orange-50 border border-orange-200 rounded-[20px] p-5 shadow-sm`}>
+        <div className={`late-records-card ${healthView === "active" ? "" : "hidden"} bg-orange-50 border border-orange-200 rounded-[20px] p-5 shadow-sm`}>
           <div className="flex gap-3">
             <AlertCircle size={22} className="text-orange-600 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-black text-orange-950">Add Previous Health Records</h3>
-              <p className="text-[11px] text-orange-800/80 leading-relaxed mt-1 mb-3">
+              <h3 className="late-records-title text-sm font-black text-orange-950">Add Previous Health Records</h3>
+              <p className="late-records-description text-[11px] text-orange-800/80 leading-relaxed mt-1 mb-3">
                 This child has historical milestone dates in the past. You can record what they received from their paper health card so their timeline stays completely accurate.
               </p>
               <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1" style={{ scrollbarWidth: 'none' }}>
                 {summary.pastUnrecorded.map((act) => (
-                  <button key={act.scheduleId} onClick={() => openForm(act)} className="w-full flex items-center justify-between text-left bg-white border border-orange-100 rounded-xl p-2.5 text-xs text-orange-900 shadow-sm active:scale-[0.99] transition">
+                  <button key={act.scheduleId} onClick={() => openForm(act)} className="late-records-row w-full flex items-center justify-between text-left bg-white border border-orange-100 rounded-xl p-2.5 text-xs text-orange-900 shadow-sm active:scale-[0.99] transition">
                     <span className="font-bold">{act.title}</span>
                     <span className="text-[10px] text-orange-500 flex items-center gap-1 font-bold">
                       Add Record <Plus size={10} />

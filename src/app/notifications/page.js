@@ -21,7 +21,9 @@ function getDaysToNext(records, dob) {
 
 function formatRelativeTime(value) {
   if (!value) return "Just now";
-  const diffMs = Date.now() - Number(value);
+  const timestamp = typeof value === "number" ? value : Date.parse(value);
+  if (!Number.isFinite(timestamp)) return "Just now";
+  const diffMs = Math.max(0, Date.now() - timestamp);
   const mins = Math.floor(diffMs / 60000);
   if (mins < 1) return "Just now";
   if (mins < 60) return `${mins} min${mins === 1 ? "" : "s"} ago`;
@@ -67,6 +69,7 @@ export default function Notifications() {
   }, []);
 
   useEffect(() => {
+    if (!auth) return undefined;
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
@@ -74,7 +77,7 @@ export default function Notifications() {
   }, []);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !db) {
       setKids([]);
       return;
     }
@@ -87,9 +90,20 @@ export default function Notifications() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, "user_notifications"), where("userId", "==", user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const remote = snapshot.docs.map((item) => ({ id: item.id, ...item.data(), timestamp: Date.parse(item.data().createdAt) }));
+      setNotifications((current) => [...remote, ...current.filter((item) => !remote.some((remoteItem) => remoteItem.id === item.id))]);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
     const tickRelativeTimes = () => {
       setNotifications(prev => prev.map((n) => ({
         ...n,
+        desc: n.desc || n.body || "",
         time: n.timestamp ? formatRelativeTime(n.timestamp) : n.time || 'Just now'
       })));
     };
@@ -230,7 +244,7 @@ export default function Notifications() {
             )
           ) : (
             actionItems.length > 0 ? actionItems.map((a, i) => (
-              <div key={i} onTouchStart={() => handlePressStart(a.type === 'watchlist' ? 'watchlist' : 'action', i, a)} onTouchEnd={handlePressEnd} onMouseDown={() => handlePressStart(a.type === 'watchlist' ? 'watchlist' : 'action', i, a)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} className={`p-5 rounded-3xl border ${a.type === 'watchlist' ? 'bg-white border-green-100' : 'bg-red-50 border-red-100'} shadow-sm flex flex-col gap-3 relative transition-transform active:scale-[0.98] cursor-pointer`}>
+              <div key={i} onTouchStart={() => handlePressStart(a.type === 'watchlist' ? 'watchlist' : 'action', i, a)} onTouchEnd={handlePressEnd} onMouseDown={() => handlePressStart(a.type === 'watchlist' ? 'watchlist' : 'action', i, a)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} className={`action-checklist-card p-5 rounded-3xl border ${a.type === 'watchlist' ? 'bg-white border-green-100' : 'bg-red-50 border-red-100'} shadow-sm flex flex-col gap-3 relative transition-transform active:scale-[0.98] cursor-pointer`}>
                 {a.type === 'watchlist' && (
                   <button onClick={() => removeWatchlist(a.videoId)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition p-1"><X size={18} /></button>
                 )}
@@ -243,11 +257,11 @@ export default function Notifications() {
                     <div className="p-3 rounded-full shadow-inner flex-shrink-0 bg-red-500 text-white">{a.icon}</div>
                   )}
                   <div>
-                    <h3 className={`font-bold text-[16px] ${a.type === 'watchlist' ? 'text-[#027027]' : 'text-red-900'}`}>{a.title}</h3>
+                    <h3 className={`font-bold text-[16px] ${a.type === 'watchlist' ? 'text-[#027027]' : 'text-red-900 dark:text-black'}`}>{a.title}</h3>
                     <p className={`text-xs font-bold uppercase tracking-wider ${a.type === 'watchlist' ? 'text-gray-500' : 'text-red-500'}`}>{a.kidName}</p>
                   </div>
                 </div>
-                <p className={`text-sm leading-relaxed pl-1 ${a.type === 'watchlist' ? 'text-gray-600' : 'text-red-700'}`}>{a.desc}</p>
+                <p className={`text-sm leading-relaxed pl-1 ${a.type === 'watchlist' ? 'text-gray-600' : 'text-red-700 dark:text-black'}`}>{a.desc}</p>
                 {a.type === 'watchlist' ? (
                   <button onClick={() => { localStorage.setItem("infy_open_video", JSON.stringify({ id: a.videoId })); router.push("/explore"); }} className="mt-2 bg-[#027027] hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-center transition active:scale-95 text-sm shadow-sm">
                     Watch Now

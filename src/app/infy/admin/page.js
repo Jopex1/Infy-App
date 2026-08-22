@@ -34,6 +34,17 @@ export default function AdminDashboard() {
   }, [router]);
 
   useEffect(() => {
+    if (!adminUser?.id) return;
+    const unsubscribe = onSnapshot(doc(db, "admins", adminUser.id), (snapshot) => {
+      if (!snapshot.exists()) {
+        sessionStorage.removeItem("infy_admin_session");
+        router.replace("/infy/admin/login");
+      }
+    }, () => {});
+    return () => unsubscribe();
+  }, [adminUser, router]);
+
+  useEffect(() => {
     if (!adminUser) return;
     const q = query(collection(db, "support_tickets"), where("status", "==", "pending"));
     const unsubscribe = onSnapshot(q, (snap) => {
@@ -118,7 +129,7 @@ export default function AdminDashboard() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8" style={{ background: "#f0f7f0" }}>
           {activeTab === "overview" && <OverviewTab />}
-          {activeTab === "users" && <UsersTab />}
+          {activeTab === "users" && <UsersTab adminUser={adminUser} />}
           {activeTab === "support" && <SupportTickets adminUser={adminUser} />}
           {activeTab === "explore_cms" && <ExploreCMS />}
           {activeTab === "carousel_cms" && <CarouselCMS />}

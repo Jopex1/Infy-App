@@ -46,7 +46,6 @@ export default function SplashScreen({ children }) {
           <div className="relative h-24 w-40 mb-2">
             <Image src="/icons/infy wordmark .png" alt="Infy Logo" fill className="object-contain" priority />
           </div>
-          <p className="text-[#027027] font-bold tracking-widest uppercase text-xs sm:text-sm">Your Baby's Health Tracker</p>
         </div>
       </div>
       {/* Render children hidden initially to avoid flash of content if it takes time to render */}

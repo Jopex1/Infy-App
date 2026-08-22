@@ -1,6 +1,5 @@
 import Topbar from "@/components/Topbar";
 import BottomNav from "@/components/BottomNav";
-import SplashScreen from "@/components/SplashScreen";
 import "./globals.css";
 
 export const metadata = {
@@ -42,9 +41,7 @@ export default function RootLayout({ children }) {
             paddingBottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' 
           }}
         >
-          <SplashScreen>
-            {children}
-          </SplashScreen>
+          {children}
         </main>
         <BottomNav />
       </body>

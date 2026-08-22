@@ -7,15 +7,26 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Profile() {
   const router = useRouter();
-  const { kids, addChild } = useChildren();
+  const { kids, addChild, deleteChild } = useChildren();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [newKid, setNewKid] = useState({ name: "", dob: "", gender: "Girl", weight: "", height: "", placeBirth: "", avatar: "" });
   const [avatarFile, setAvatarFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [deleteKid, setDeleteKid] = useState(null);
   const [user, setUser] = useState({ firstName: "", lastName: "", email: "", phone: "", location: "", avatar: null });
   const fileRef = useRef();
+  const holdTimer = useRef(null);
+
+  const startKidHold = (kid) => {
+    holdTimer.current = setTimeout(() => setDeleteKid(kid), 3000);
+  };
+
+  const cancelKidHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("infy_user");
@@ -142,7 +153,7 @@ export default function Profile() {
           {kids.map((kid, idx) => {
             const colors = ["bg-orange-100 text-orange-600", "bg-blue-100 text-blue-600", "bg-pink-100 text-pink-600", "bg-purple-100 text-purple-600"];
             return (
-              <button key={kid.id} onClick={() => openEditKid(kid)}
+              <button key={kid.id} onClick={() => openEditKid(kid)} onPointerDown={() => startKidHold(kid)} onPointerUp={cancelKidHold} onPointerLeave={cancelKidHold} onPointerCancel={cancelKidHold}
                 className="flex flex-col items-center gap-1.5 group">
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold ${colors[idx % colors.length]} border-2 border-white shadow-md group-active:scale-95 transition overflow-hidden`}>
                   {kid.avatar ? (
@@ -152,6 +163,7 @@ export default function Profile() {
                   )}
                 </div>
                 <span className="text-[10px] uppercase text-gray-500 font-medium">{kid.name}</span>
+                {kid.createdAt && <span className="text-[9px] text-gray-400">Added {new Date(kid.createdAt).toLocaleDateString()}</span>}
               </button>
             );
           })}
@@ -162,6 +174,19 @@ export default function Profile() {
           <Plus size={18}/> Add Child
         </button>
       </div>
+
+      {deleteKid && (
+        <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-5" onClick={() => setDeleteKid(null)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-bold text-lg text-gray-900">Delete {deleteKid.name}?</h3>
+            <p className="text-sm text-gray-500 mt-2">This child profile and its records will be removed.</p>
+            <div className="flex gap-3 mt-5">
+              <button onClick={() => setDeleteKid(null)} className="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-gray-600">Cancel</button>
+              <button onClick={async () => { await deleteChild(deleteKid.id); setDeleteKid(null); }} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Kid Form */}
       {isAdding && (

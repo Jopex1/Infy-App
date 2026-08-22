@@ -28,6 +28,12 @@ export function useChildren() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      setKids(stored ? JSON.parse(stored) : []);
+      setLoading(false);
+      return undefined;
+    }
     const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (!currentUser) {
@@ -40,7 +46,7 @@ export function useChildren() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !db) return;
 
     const q = query(collection(db, "children"), where("userId", "==", user.uid));
     const unsub = onSnapshot(q, (snapshot) => {
@@ -70,6 +76,7 @@ export function useChildren() {
 
     let avatarUrl = childData.avatar || "";
     if (avatarFile) {
+      if (!storage) throw new Error("Firebase Storage is not configured.");
       const imageRef = ref(storage, `avatars/${user.uid}_${Date.now()}`);
       await uploadBytes(imageRef, avatarFile);
       avatarUrl = await getDownloadURL(imageRef);

@@ -17,7 +17,13 @@ export default function ExploreCMS() {
         // No data yet, could initialize here, but let's just show empty state
         setCategories([]);
       } else {
-        const cats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const cats = snap.docs.map(d => {
+          const category = { id: d.id, ...d.data() };
+          if (category.title?.toLowerCase().includes("growth") || category.title?.toLowerCase().includes("development")) {
+            category.image = "/images/growth and dev.jpeg";
+          }
+          return category;
+        });
         // Sort by some order if available, else by title
         cats.sort((a, b) => (a.order || 0) - (b.order || 0));
         setCategories(cats);
@@ -40,7 +46,7 @@ export default function ExploreCMS() {
       { title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{ id: "UqYTOziVxXI" }, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
       { title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "2vqhTU16Dr4" }, { id: "YfhWxMmBIW4" }] },
       { title: "Health and Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
-      { title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
+      { title: "Growth Milestone", icon: "📏", image: "/images/growth and dev.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
       { title: "Sleep and Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
       { title: "Safety and First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
       { title: "Hygiene and Care", icon: "🧼", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "YfhWxMmBIW4" }, { id: "c7Yr3KNnujs" }] },

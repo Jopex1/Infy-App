@@ -4,7 +4,8 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { Users, Trash2, UserPlus, Search, RefreshCw, Phone, Mail, Briefcase } from "lucide-react";
 
-export default function UsersTab() {
+export default function UsersTab({ adminUser }) {
+  const isSuper = adminUser?.role === "SUPER_ADMIN";
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,10 @@ export default function UsersTab() {
     setError("");
     try {
       const res = await fetch("/api/admin/users");
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error(`Users service returned an invalid response (${res.status}). Check Firebase Admin credentials.`); }
+      if (!res.ok) throw new Error(data.error || `Users service failed (${res.status}).`);
       if (data.error) throw new Error(data.error);
       setUsers(data.users);
       setTotal(data.total);
@@ -187,9 +191,9 @@ export default function UsersTab() {
               <h2 className="text-xl font-black" style={{ color: "#014d1a" }}>Health Professionals</h2>
               <p className="text-sm mt-1" style={{ color: "#4caf50" }}>Add professionals to forward support tickets to.</p>
             </div>
-            <button onClick={() => setAddingPro(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-bold" style={{ background: "#027027" }}>
+            {isSuper && <button onClick={() => setAddingPro(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-bold" style={{ background: "#027027" }}>
               <UserPlus size={16} /> Add Professional
-            </button>
+            </button>}
           </div>
 
           {addingPro && (
@@ -227,9 +231,9 @@ export default function UsersTab() {
                   <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-xl" style={{ background: "#e8f5e9", color: "#027027" }}>
                     {pro.name[0]}
                   </div>
-                  <button onClick={() => handleDeletePro(pro.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition">
+                  {isSuper && <button onClick={() => handleDeletePro(pro.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition">
                     <Trash2 size={15} />
-                  </button>
+                  </button>}
                 </div>
                 <div>
                   <p className="font-black text-gray-900">{pro.name}</p>

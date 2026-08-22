@@ -14,6 +14,7 @@ export default function Onboarding() {
   const router = useRouter();
 
   useEffect(() => {
+    if (!auth) return undefined;
     const unsubscribe = onAuthStateChanged(auth, (u) => setUserAuth(u));
     return () => unsubscribe();
   }, []);

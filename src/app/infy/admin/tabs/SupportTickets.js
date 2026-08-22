@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, getDocs } from "firebase/firestore";
-import { Forward, CheckCircle, Clock, X, User } from "lucide-react";
+import { collection, onSnapshot, query, orderBy, doc, updateDoc, getDocs, addDoc, deleteDoc } from "firebase/firestore";
+import { Forward, CheckCircle, Clock, X, Trash2 } from "lucide-react";
 
 export default function SupportTickets({ adminUser }) {
   const [tickets, setTickets] = useState([]);
@@ -47,9 +47,25 @@ export default function SupportTickets({ adminUser }) {
   const handleResolve = async (ticket) => {
     try {
       await updateDoc(doc(db, "support_tickets", ticket.id), { status: "resolved", resolvedAt: new Date().toISOString() });
+      if (ticket.userId) {
+        await addDoc(collection(db, "user_notifications"), {
+          userId: ticket.userId,
+          title: "Infy Health Professionals responded",
+          desc: "Infy Health Professionals has responded to your mail. Please check your Gmail app.",
+          type: "support_response",
+          createdAt: new Date().toISOString(),
+          unread: true
+        });
+      }
     } catch(err) {
       console.error(err);
     }
+  };
+
+  const handleDelete = async (ticket) => {
+    if (!confirm("Delete this ticket permanently?")) return;
+    try { await deleteDoc(doc(db, "support_tickets", ticket.id)); }
+    catch (err) { alert("Error deleting ticket: " + err.message); }
   };
 
   if (loading) return <div className="font-bold" style={{ color: "#027027" }}>Loading tickets...</div>;
@@ -94,6 +110,9 @@ export default function SupportTickets({ adminUser }) {
               )}
               <button onClick={() => setForwardModal(ticket)} className="px-4 py-2 text-white rounded-lg text-sm font-bold transition flex items-center gap-2 shadow-sm" style={{ background: '#027027' }}>
                 <Forward size={16} /> Forward to Doctor
+              </button>
+              <button onClick={() => handleDelete(ticket)} className="px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100">
+                <Trash2 size={16} /> Delete
               </button>
             </div>
           </div>

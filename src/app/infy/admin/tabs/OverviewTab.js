@@ -5,23 +5,36 @@ import { collection, getDocs } from "firebase/firestore";
 import { Users, Activity, MessageCircle, BarChart3, TrendingUp } from "lucide-react";
 
 export default function OverviewTab() {
-  const [stats, setStats] = useState({ users: 0, children: 0, visitorsToday: 0, visitorsTotal: 0, tickets: 0 });
+  const [stats, setStats] = useState({ users: 0, activeUsers: 0, children: 0, visitorsToday: 0, visitorsTotal: 0, tickets: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const usersSnap = await getDocs(collection(db, "users"));
-        const childrenSnap = await getDocs(collection(db, "children"));
-        const ticketsSnap = await getDocs(collection(db, "support_tickets"));
-        const analyticsSnap = await getDocs(collection(db, "analytics"));
+        const [usersResult, childrenResult, ticketsResult, analyticsResult, activeUsersResult] = await Promise.allSettled([
+          getDocs(collection(db, "users")), getDocs(collection(db, "children")),
+          getDocs(collection(db, "support_tickets")), getDocs(collection(db, "analytics")),
+          fetch("/api/admin/users").then(async (response) => {
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.error || "Unable to load active users");
+            return payload.users || [];
+          })
+        ]);
+        const usersSnap = usersResult.status === "fulfilled" ? usersResult.value : null;
+        const childrenSnap = childrenResult.status === "fulfilled" ? childrenResult.value : null;
+        const ticketsSnap = ticketsResult.status === "fulfilled" ? ticketsResult.value : null;
+        const analyticsSnap = analyticsResult.status === "fulfilled" ? analyticsResult.value : null;
+        const activeUsers = activeUsersResult.status === "fulfilled" ? activeUsersResult.value.filter((user) => {
+          const lastSignIn = Date.parse(user.lastSignIn || "");
+          return Number.isFinite(lastSignIn) && Date.now() - lastSignIn < 30 * 24 * 60 * 60 * 1000;
+        }).length : 0;
         let totalVisits = 0, todayVisits = 0;
         const today = new Date().toISOString().split('T')[0];
-        analyticsSnap.forEach(doc => {
+        analyticsSnap?.forEach(doc => {
           totalVisits += (doc.data().visitors || 0);
           if (doc.id === today) todayVisits = doc.data().visitors || 0;
         });
-        setStats({ users: usersSnap.size, children: childrenSnap.size, visitorsToday: todayVisits, visitorsTotal: totalVisits, tickets: ticketsSnap.size });
+        setStats({ users: usersSnap?.size || 0, activeUsers, children: childrenSnap?.size || 0, visitorsToday: todayVisits, visitorsTotal: totalVisits, tickets: ticketsSnap?.size || 0 });
       } catch (err) { console.error(err); }
       setLoading(false);
     };
@@ -40,6 +53,7 @@ export default function OverviewTab() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Today's Visitors" value={stats.visitorsToday} icon={<TrendingUp size={22} />} color="#027027" bg="#e8f5e9" />
         <StatCard title="Total Visitors" value={stats.visitorsTotal} icon={<BarChart3 size={22} />} color="#027027" bg="#f0f7f0" />
+        <StatCard title="Active Users (30d)" value={stats.activeUsers} icon={<Activity size={22} />} color="#027027" bg="#e8f5e9" />
         <StatCard title="Total Children" value={stats.children} icon={<Users size={22} />} color="#014d1a" bg="#c8e6c9" />
         <StatCard title="Support Tickets" value={stats.tickets} icon={<MessageCircle size={22} />} color="#027027" bg="#e8f5e9" />
       </div>

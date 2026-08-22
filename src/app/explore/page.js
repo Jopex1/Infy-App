@@ -12,7 +12,7 @@ const FALLBACK_CATEGORIES = [
   { id: "cat_2", order: 2, title: "Child Development", icon: "🧠", image: "/images/thumbnails/child development.jpg.jpeg", color: "bg-purple-50 border-purple-200", iconBg: "bg-purple-100", videos: [{ id: "UqYTOziVxXI" }, { id: "i3oAo0FSpn8" }, { id: "VVmMK4ZcPxY" }] },
   { id: "cat_3", order: 3, title: "Newborn Care", icon: "👶", image: "/images/thumbnails/Newborn Care.jpeg", color: "bg-pink-50 border-pink-200", iconBg: "bg-pink-100", videos: [{ id: "Z_mY4-MNyFU" }, { id: "2vqhTU16Dr4" }, { id: "YfhWxMmBIW4" }] },
   { id: "cat_4", order: 4, title: "Health & Wellness", icon: "❤️", image: "/images/thumbnails/health and wellness.jpg.jpeg", color: "bg-red-50 border-red-200", iconBg: "bg-red-100", videos: [{ id: "yQtehKRIHmE" }, { id: "u2UZS3KqeFs" }, { id: "yE7OMXkESLw" }] },
-  { id: "cat_5", order: 5, title: "Growth Milestone", icon: "📏", image: "/images/thumbnails/Growth Milestone.jpg.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
+  { id: "cat_5", order: 5, title: "Growth Milestone", icon: "📏", image: "/images/growth and dev.jpeg", color: "bg-blue-50 border-blue-200", iconBg: "bg-blue-100", videos: [{ id: "b2h7u45kqrI" }, { id: "3Bm9T8R2u2s" }] },
   { id: "cat_6", order: 6, title: "Sleep & Rest", icon: "😴", image: "/images/thumbnails/Sleep and Rest .jpeg", color: "bg-indigo-50 border-indigo-200", iconBg: "bg-indigo-100", videos: [{ id: "VMmlO0-OPls" }, { id: "XknDPHgbTy0" }] },
   { id: "cat_7", order: 7, title: "Safety & First Aid", icon: "🩹", image: "/images/thumbnails/Safety and First AId.jpeg", color: "bg-yellow-50 border-yellow-200", iconBg: "bg-yellow-100", videos: [{ id: "l9KoiK-Fnog" }, { id: "XknDPHgbTy0" }] },
   { id: "cat_8", order: 8, title: "Hygiene & Care", icon: "🧼", image: "/images/thumbnails/Hygein and Care.jpg.jpeg", color: "bg-teal-50 border-teal-200", iconBg: "bg-teal-100", videos: [{ id: "YfhWxMmBIW4" }, { id: "c7Yr3KNnujs" }] },
@@ -36,7 +36,13 @@ export default function ExplorePage() {
       try {
         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
         const snap = await Promise.race([getDocs(collection(db, "content_explore")), timeoutPromise]);
-        const cats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const cats = snap.docs.map(d => {
+          const category = { id: d.id, ...d.data() };
+          if (category.title?.toLowerCase().includes("growth") || category.title?.toLowerCase().includes("development")) {
+            category.image = "/images/growth and dev.jpeg";
+          }
+          return category;
+        });
         cats.sort((a, b) => (a.order || 0) - (b.order || 0));
         if (cats.length > 0) {
           setCategories(cats);
