@@ -12,7 +12,7 @@
     "@lottiefiles/dotlottie-react": "^0.19.13",
     "@netlify/plugin-nextjs": "^5.15.13",
     "firebase": "^12.16.0",
-    "firebase-admin": "^14.3.0",
+    "firebase-admin": "13.5.0",
     "lucide-react": "^1.18.0",
     "next": "16.2.9",
     "react": "19.2.4",

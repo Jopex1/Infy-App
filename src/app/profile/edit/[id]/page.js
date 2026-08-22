@@ -26,9 +26,13 @@ export default function EditChildPage() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     setSaving(true);
-    updateChild(id, kid, avatarFile).catch(() => {
+    try {
+      await updateChild(id, kid, avatarFile);
+    } catch {
+      setSaving(false);
       alert("Failed to save. Please try again.");
-    });
+      return;
+    }
     router.replace("/profile");
   };
 
