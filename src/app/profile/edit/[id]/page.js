@@ -29,7 +29,7 @@ export default function EditChildPage() {
     try {
       await updateChild(id, kid, avatarFile);
       setSaving(false);
-      router.push("/profile");
+      router.replace("/profile");
     } catch (err) {
       setSaving(false);
       alert("Failed to save. Please try again.");
